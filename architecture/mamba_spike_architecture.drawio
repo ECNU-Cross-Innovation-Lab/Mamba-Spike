@@ -1,0 +1,295 @@
+<mxfile host="app.diagrams.net" modified="2024-11-11T11:30:00.000Z" agent="5.0" version="21.0.0" etag="mamba-spike-v1" type="device">
+  <diagram name="Mamba-Spike Architecture" id="mamba-spike-arch">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1400" pageHeight="1000" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- Title -->
+        <mxCell id="title" value="Mamba-Spike Architecture" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="450" y="20" width="500" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- Input Layer -->
+        <mxCell id="input" value="Event-based Input&#xa;(B, T, C, H, W)&#xa;DVS Camera Events" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="550" y="100" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 1 -->
+        <mxCell id="arrow1" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666" edge="1" parent="1" source="input" target="spiking_frontend">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="200" as="sourcePoint" />
+            <mxPoint x="700" y="250" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Spiking Front-End Block -->
+        <mxCell id="spiking_frontend" value="Spiking Front-End" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;fontSize=16;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="450" y="230" width="500" height="280" as="geometry" />
+        </mxCell>
+
+        <!-- Conv1 + LIF1 -->
+        <mxCell id="conv1" value="Conv2d (C→32, 3x3)&#xa;+ MaxPool2d (2x2)&#xa;+ LIF Neuron (β=0.9)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="480" y="270" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Conv2 + LIF2 -->
+        <mxCell id="conv2" value="Conv2d (32→32, 3x3)&#xa;+ MaxPool2d (2x2)&#xa;+ LIF Neuron (β=0.9)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="700" y="270" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Conv3 + LIF3 -->
+        <mxCell id="conv3" value="Conv2d (32→64, 3x3)&#xa;+ LIF Neuron (β=0.9)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="590" y="350" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Spike Output -->
+        <mxCell id="spike_output" value="Sparse Spikes&#xa;(B, T, 64, H', W')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="590" y="430" width="200" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows within Spiking Frontend -->
+        <mxCell id="arrow_conv1_conv2" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2" edge="1" parent="1" source="conv1" target="conv2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="680" y="300" as="sourcePoint" />
+            <mxPoint x="700" y="300" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow_conv2_conv3" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2;entryX=0.5;entryY=0;entryDx=0;entryDy=0" edge="1" parent="1" source="conv2" target="conv3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="800" y="330" as="sourcePoint" />
+            <mxPoint x="690" y="350" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow_conv3_spike" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2" edge="1" parent="1" source="conv3" target="spike_output">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="690" y="410" as="sourcePoint" />
+            <mxPoint x="690" y="430" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow 2: Frontend to Interface -->
+        <mxCell id="arrow2" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666" edge="1" parent="1" source="spiking_frontend" target="interface">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="510" as="sourcePoint" />
+            <mxPoint x="700" y="560" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Interface Layer -->
+        <mxCell id="interface" value="Interface Layer&#xa;Spike-to-Activation Conversion&#xa;Rate Coding + Temporal Smoothing&#xa;(B, T, 64×H'×W')" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="560" width="400" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 3: Interface to Projection -->
+        <mxCell id="arrow3" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666" edge="1" parent="1" source="interface" target="projection">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="640" as="sourcePoint" />
+            <mxPoint x="700" y="680" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Input Projection -->
+        <mxCell id="projection" value="Linear Projection&#xa;spike_features → d_model (128)&#xa;(B, T, 128)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="550" y="680" width="300" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 4: Projection to Mamba -->
+        <mxCell id="arrow4" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666" edge="1" parent="1" source="projection" target="mamba_backbone">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="750" as="sourcePoint" />
+            <mxPoint x="700" y="800" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Mamba Backbone -->
+        <mxCell id="mamba_backbone" value="Mamba Backbone (4 Layers)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=16;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="200" y="790" width="800" height="280" as="geometry" />
+        </mxCell>
+
+        <!-- Mamba Block 1 -->
+        <mxCell id="mamba1" value="Mamba Block 1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=13;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="230" y="830" width="170" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mamba1_norm" value="LayerNorm" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#bbdefb;strokeColor=#1976d2;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="245" y="860" width="140" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mamba1_ssm" value="Selective SSM&#xa;• Conv1d (kernel=4)&#xa;• State Space&#xa;• Gated MLP" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#90caf9;strokeColor=#1976d2;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="245" y="900" width="140" height="80" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mamba1_residual" value="+ Residual" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#64b5f6;strokeColor=#1976d2;fontSize=11;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="245" y="990" width="140" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Mamba Block 2 -->
+        <mxCell id="mamba2" value="Mamba Block 2" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=13;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="420" y="830" width="170" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mamba2_content" value="Same Structure&#xa;as Block 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="445" y="905" width="120" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Mamba Block 3 -->
+        <mxCell id="mamba3" value="Mamba Block 3" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=13;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="610" y="830" width="170" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mamba3_content" value="Same Structure&#xa;as Block 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="635" y="905" width="120" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Mamba Block 4 -->
+        <mxCell id="mamba4" value="Mamba Block 4" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=13;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="800" y="830" width="170" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="mamba4_content" value="Same Structure&#xa;as Block 1" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=12;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="825" y="905" width="120" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows between Mamba blocks -->
+        <mxCell id="arrow_m1_m2" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2" edge="1" parent="1" source="mamba1" target="mamba2">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="400" y="930" as="sourcePoint" />
+            <mxPoint x="420" y="930" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow_m2_m3" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2" edge="1" parent="1" source="mamba2" target="mamba3">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="590" y="930" as="sourcePoint" />
+            <mxPoint x="610" y="930" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <mxCell id="arrow_m3_m4" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=2" edge="1" parent="1" source="mamba3" target="mamba4">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="780" y="930" as="sourcePoint" />
+            <mxPoint x="800" y="930" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow 5: Mamba to Pooling -->
+        <mxCell id="arrow5" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666;exitX=0.5;exitY=1;exitDx=0;exitDy=0" edge="1" parent="1" source="mamba_backbone" target="pooling">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="600" y="1070" as="sourcePoint" />
+            <mxPoint x="600" y="1110" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Global Average Pooling -->
+        <mxCell id="pooling" value="Global Average Pooling&#xa;over time dimension&#xa;(B, 128)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff4e6;strokeColor=#d79b00;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="500" y="1110" width="400" height="70" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 6: Pooling to Classifier -->
+        <mxCell id="arrow6" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666" edge="1" parent="1" source="pooling" target="classifier">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="1180" as="sourcePoint" />
+            <mxPoint x="700" y="1220" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Classification Head -->
+        <mxCell id="classifier" value="Classification Head" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontSize=16;fontStyle=1;verticalAlign=top" vertex="1" parent="1">
+          <mxGeometry x="520" y="1220" width="360" height="120" as="geometry" />
+        </mxCell>
+
+        <mxCell id="classifier_norm" value="LayerNorm (128)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8bbd0;strokeColor=#c2185b;fontSize=12" vertex="1" parent="1">
+          <mxGeometry x="550" y="1255" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="classifier_linear" value="Linear (128 → num_classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f48fb1;strokeColor=#c2185b;fontSize=12;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="550" y="1295" width="300" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 7: Classifier to Output -->
+        <mxCell id="arrow7" value="" style="endArrow=classic;html=1;rounded=0;strokeWidth=3;strokeColor=#666666" edge="1" parent="1" source="classifier" target="output">
+          <mxGeometry width="50" height="50" relative="1" as="geometry">
+            <mxPoint x="700" y="1340" as="sourcePoint" />
+            <mxPoint x="700" y="1380" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Output -->
+        <mxCell id="output" value="Output Logits&#xa;Class Predictions&#xa;(B, num_classes)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffccbc;strokeColor=#ff5722;fontSize=14;fontStyle=1" vertex="1" parent="1">
+          <mxGeometry x="550" y="1380" width="300" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Side annotations -->
+        <mxCell id="note1" value="Event-driven&#xa;Processing" style="text;html=1;strokeColor=#d6b656;fillColor=#fff2cc;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="1020" y="350" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note2" value="Sparse&#xa;Representation" style="text;html=1;strokeColor=#82b366;fillColor=#d5e8d4;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="1020" y="575" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="note3" value="Linear-time&#xa;Sequence Modeling" style="text;html=1;strokeColor=#666666;fillColor=#f5f5f5;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=1;fontSize=11;fontStyle=2" vertex="1" parent="1">
+          <mxGeometry x="1020" y="905" width="140" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend" value="Legend" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=14;fontStyle=1;verticalAlign=top;align=left" vertex="1" parent="1">
+          <mxGeometry x="50" y="100" width="320" height="280" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_input" value="Input/Output Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="140" width="130" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_spiking" value="Spiking Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="220" y="140" width="130" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_interface" value="Interface Layer" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="185" width="130" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_mamba" value="Mamba Block" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="220" y="185" width="130" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_classifier" value="Classification" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fce4ec;strokeColor=#c2185b;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="230" width="130" height="30" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend_params" value="Model Info:&#xa;• Parameters: ~1.2M&#xa;• Input: (B,T,2,H,W)&#xa;• Output: (B,num_classes)&#xa;• d_model: 128&#xa;• n_layers: 4" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=top;whiteSpace=wrap;rounded=0;fontSize=10" vertex="1" parent="1">
+          <mxGeometry x="70" y="275" width="280" height="95" as="geometry" />
+        </mxCell>
+
+        <!-- Key Features Box -->
+        <mxCell id="features" value="Key Features" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#000000;fontSize=14;fontStyle=1;verticalAlign=top;align=left" vertex="1" parent="1">
+          <mxGeometry x="50" y="420" width="320" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="feature1" value="✓ Event-driven SNN front-end" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="455" width="280" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="feature2" value="✓ Selective State Spaces" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="485" width="280" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="feature3" value="✓ Linear-time complexity O(L)" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="515" width="280" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="feature4" value="✓ Energy-efficient sparse spikes" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="545" width="280" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="feature5" value="✓ Long-range temporal modeling" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=11" vertex="1" parent="1">
+          <mxGeometry x="70" y="575" width="280" height="20" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
