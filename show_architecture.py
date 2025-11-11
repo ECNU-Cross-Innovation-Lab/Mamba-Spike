@@ -20,7 +20,7 @@ def print_ascii_architecture():
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │              🔥 Spiking Front-End (SNN)                     │
+    │              Spiking Front-End (SNN)                     │
     │  ┌───────────────────────────────────────────────────────┐  │
     │  │ Conv2d(2→32, 3x3) + MaxPool(2x2) + LIF(β=0.9)        │  │
     │  │          ↓ Sparse Spikes                              │  │
@@ -41,7 +41,7 @@ def print_ascii_architecture():
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │              ⚡ Interface Layer                             │
+    │              Interface Layer                             │
     │    Spike → Activation Conversion                           │
     │    • Rate Coding (temporal averaging)                      │
     │    • Temporal Smoothing (Conv1d, kernel=5)                │
@@ -50,16 +50,16 @@ def print_ascii_architecture():
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │           🎯 Input Projection                               │
+    │           Input Projection                               │
     │         Linear(spike_features → 128)                       │
     │         Output: (B, T, 128)                                │
     └────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │              🧠 Mamba Backbone (SSM)                        │
+    │              Mamba Backbone (SSM)                        │
     │  ┌───────────────────────────────────────────────────────┐  │
-    │  │ 📦 Mamba Block 1                                      │  │
+    │  │ Mamba Block 1                                      │  │
     │  │   ├─ LayerNorm(128)                                   │  │
     │  │   ├─ SelectiveSSM                                     │  │
     │  │   │   ├─ Input Projection (d_model → 2×d_inner)      │  │
@@ -73,13 +73,13 @@ def print_ascii_architecture():
     │  │   └─ Residual Connection (+)                          │  │
     │  └────────────────────────┬──────────────────────────────┘  │
     │  ┌───────────────────────────────────────────────────────┐  │
-    │  │ 📦 Mamba Block 2 (same structure)                     │  │
+    │  │ Mamba Block 2 (same structure)                     │  │
     │  └────────────────────────┬──────────────────────────────┘  │
     │  ┌───────────────────────────────────────────────────────┐  │
-    │  │ 📦 Mamba Block 3 (same structure)                     │  │
+    │  │ Mamba Block 3 (same structure)                     │  │
     │  └────────────────────────┬──────────────────────────────┘  │
     │  ┌───────────────────────────────────────────────────────┐  │
-    │  │ 📦 Mamba Block 4 (same structure)                     │  │
+    │  │ Mamba Block 4 (same structure)                     │  │
     │  └───────────────────────────────────────────────────────┘  │
     │                                                              │
     │    Feature: O(L) complexity, Long-range modeling            │
@@ -88,14 +88,14 @@ def print_ascii_architecture():
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │        📊 Global Average Pooling                            │
+    │        Global Average Pooling                            │
     │           mean over time dimension                          │
     │           Output: (B, 128)                                  │
     └────────────────────────┬────────────────────────────────────┘
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │           🎓 Classification Head                            │
+    │           Classification Head                            │
     │  ┌───────────────────────────────────────────────────────┐  │
     │  │ LayerNorm(128)                                        │  │
     │  └────────────────────────┬──────────────────────────────┘  │
@@ -106,7 +106,7 @@ def print_ascii_architecture():
                              │
                              ▼
     ┌─────────────────────────────────────────────────────────────┐
-    │                  ✅ Output Logits                           │
+    │                  Output Logits                           │
     │                 (B, num_classes)                            │
     │              Class Predictions                              │
     └─────────────────────────────────────────────────────────────┘
@@ -120,7 +120,7 @@ def print_ascii_architecture():
 def print_model_statistics():
     """打印模型统计信息"""
     print("=" * 80)
-    print("📊 Model Statistics")
+    print("Model Statistics")
     print("=" * 80)
     print()
 
@@ -166,36 +166,36 @@ def print_model_statistics():
 def print_key_features():
     """打印关键特性"""
     print("=" * 80)
-    print("🌟 Key Features & Innovations")
+    print("Key Features & Innovations")
     print("=" * 80)
     print()
 
     features = """
-    1. 🔥 Event-Driven Spiking Front-End
+    1. Event-Driven Spiking Front-End
        • Leaky Integrate-and-Fire (LIF) neurons
        • Biologically plausible spike generation
        • Energy-efficient sparse computation
        • Direct processing of DVS camera events
 
-    2. ⚡ Efficient Spike-to-Activation Interface
+    2. Efficient Spike-to-Activation Interface
        • Rate coding with temporal averaging
        • Smooth conversion preserving temporal structure
        • Enables gradient backpropagation
        • Bridges discrete SNN and continuous Mamba
 
-    3. 🧠 Selective State Space Models (SSM)
+    3. Selective State Space Models (SSM)
        • Data-dependent parameters: dt, B, C = f(x)
        • Linear time complexity: O(L) vs O(L²) in Transformers
        • Long-range temporal dependencies
        • Selective information retention/forgetting
 
-    4. 🎯 Hybrid Architecture Benefits
+    4. Hybrid Architecture Benefits
        • Combines SNN efficiency with SSM performance
        • 78.5% sparsity on DVS Gesture dataset
        • Lower latency: 15ms vs 18-25ms (baselines)
        • Higher accuracy across all datasets
 
-    5. 🚀 Computational Advantages
+    5. Computational Advantages
        • Linear-time sequence processing
        • Reduced memory footprint
        • GPU-friendly parallel computation
@@ -210,7 +210,7 @@ def print_key_features():
 def print_data_flow():
     """打印数据流"""
     print("=" * 80)
-    print("🔄 Data Flow Example (N-MNIST)")
+    print("Data Flow Example (N-MNIST)")
     print("=" * 80)
     print()
 
@@ -265,7 +265,7 @@ def print_data_flow():
 def print_code_mapping():
     """打印代码映射"""
     print("=" * 80)
-    print("💻 Architecture → Code Mapping")
+    print("Architecture → Code Mapping")
     print("=" * 80)
     print()
 
@@ -274,7 +274,7 @@ def print_code_mapping():
 
     class MambaSpike(nn.Module):
 
-        # 🔥 Spiking Front-End
+        # Spiking Front-End
         self.spiking_frontend = SpikingFrontEnd(
             in_channels=2,
             hidden_channels=32,
@@ -282,18 +282,18 @@ def print_code_mapping():
             beta=0.9  # LIF decay rate
         )
 
-        # ⚡ Interface Layer
+        # Interface Layer
         self.spike_to_activation = SpikeToActivation(
             method="rate"  # Rate coding
         )
 
-        # 🎯 Input Projection
+        # Input Projection
         self.input_proj = nn.Linear(
             spike_features,  # 64 * H' * W'
             d_model          # 128
         )
 
-        # 🧠 Mamba Backbone
+        # Mamba Backbone
         self.mamba_blocks = nn.ModuleList([
             MambaBlock(
                 d_model=128,
@@ -304,7 +304,7 @@ def print_code_mapping():
             for _ in range(4)  # 4 layers
         ])
 
-        # 🎓 Classification Head
+        # Classification Head
         self.norm = nn.LayerNorm(128)
         self.classifier = nn.Linear(128, num_classes)
 
@@ -328,7 +328,7 @@ def print_code_mapping():
 def main():
     """主函数"""
     print("\n")
-    print("🎨 Mamba-Spike Architecture Visualization")
+    print("Mamba-Spike Architecture Visualization")
     print("=" * 80)
     print()
 
@@ -339,20 +339,20 @@ def main():
     print_code_mapping()
 
     print("=" * 80)
-    print("📚 Additional Resources")
+    print("Additional Resources")
     print("=" * 80)
     print()
-    print("1. 📊 Draw.io Diagram:")
+    print("1. Draw.io Diagram:")
     print("   Open 'architecture/mamba_spike_architecture.drawio'")
     print("   in https://app.diagrams.net/")
     print()
-    print("2. 📖 Detailed Documentation:")
+    print("2. Detailed Documentation:")
     print("   Read 'architecture/README.md'")
     print()
-    print("3. 💻 Code Implementation:")
+    print("3. Code Implementation:")
     print("   See 'models/mamba_spike.py'")
     print()
-    print("4. 📄 Original Paper:")
+    print("4. Original Paper:")
     print("   https://arxiv.org/abs/2408.11823")
     print()
     print("=" * 80)
