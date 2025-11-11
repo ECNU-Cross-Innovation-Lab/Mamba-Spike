@@ -9,7 +9,7 @@ import torch
 
 # 检查MPS是否可用
 if not torch.backends.mps.is_available():
-    print("❌ MPS加速不可用!")
+    print("MPS加速不可用!")
     print("可能原因:")
     print("  1. PyTorch版本过低 (需要 >= 2.0)")
     print("  2. macOS版本过低 (需要 >= 12.3)")
@@ -19,8 +19,8 @@ if not torch.backends.mps.is_available():
 print("=" * 60)
 print("M3 Max 优化训练配置")
 print("=" * 60)
-print(f"✅ MPS加速已启用")
-print(f"✅ PyTorch版本: {torch.__version__}")
+print(f"MPS加速已启用")
+print(f"PyTorch版本: {torch.__version__}")
 print("=" * 60)
 
 # 导入训练模块
@@ -67,7 +67,7 @@ def main():
     args = parser.parse_args()
 
     # 打印优化建议
-    print("\n💡 M3 Max训练优化建议:")
+    print("\nM3 Max训练优化建议:")
     print("=" * 60)
     print("1. 关闭低电量模式以获得最佳性能")
     print("2. 连接电源适配器")
@@ -75,7 +75,7 @@ def main():
     print("4. 训练时不要让Mac进入睡眠")
     print("=" * 60)
 
-    print("\n📊 训练配置:")
+    print("\n训练配置:")
     print("=" * 60)
     print(f"  数据集: {args.dataset}")
     print(f"  训练轮数: {args.epochs}")
@@ -103,16 +103,16 @@ def main():
     if args.dataset in estimated_times:
         if args.epochs in estimated_times[args.dataset]:
             est_time = estimated_times[args.dataset][args.epochs]
-            print(f"\n⏱️  预计训练时间: {est_time} 小时")
+            print(f"\n 预计训练时间: {est_time} 小时")
         else:
-            print(f"\n⏱️  预计训练时间: 根据epochs数量而定")
+            print(f"\n 预计训练时间: 根据epochs数量而定")
 
-    print("\n💾 训练结果将保存到: {}/{}_{}_*".format(
+    print("\n训练结果将保存到: {}/{}_{}_*".format(
         args.output_dir, args.dataset,
         'timestamp'
     ))
 
-    print("\n🚀 开始训练...")
+    print("\n开始训练...")
     print("=" * 60)
 
     # 导入必要的包
@@ -129,17 +129,17 @@ def main():
     try:
         trainer.train()
     except KeyboardInterrupt:
-        print("\n\n⚠️  训练被用户中断")
+        print("\n\n 训练被用户中断")
         print("已保存的checkpoint可以在 {} 找到".format(args.output_dir))
     except Exception as e:
-        print(f"\n❌ 训练出错: {e}")
+        print(f"\n训练出错: {e}")
         import traceback
         traceback.print_exc()
 
     print("\n" + "=" * 60)
     print("训练完成！")
     print("=" * 60)
-    print("\n📊 后续步骤:")
+    print("\n后续步骤:")
     print("1. 查看TensorBoard: tensorboard --logdir={}".format(args.output_dir))
     print("2. 评估模型: python evaluate.py --checkpoint outputs/.../checkpoint_best.pth")
     print("3. 如需更好性能，考虑使用云端GPU: 查看 CLOUD_GPU_GUIDE.md")

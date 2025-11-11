@@ -23,13 +23,13 @@ def simple_train():
     # 1. 设置设备
     if torch.cuda.is_available():
         device = torch.device("cuda")
-        print("✅ 使用 CUDA (GPU)")
+        print("使用 CUDA (GPU)")
     elif hasattr(torch.backends, 'mps') and torch.backends.mps.is_available():
         device = torch.device("mps")
-        print("✅ 使用 MPS (Apple Silicon)")
+        print("使用 MPS (Apple Silicon)")
     else:
         device = torch.device("cpu")
-        print("✅ 使用 CPU")
+        print("使用 CPU")
 
     # 2. 准备数据
     print("\n正在加载 N-MNIST 数据集...")
@@ -42,7 +42,7 @@ def simple_train():
         num_workers=2  # 数据加载线程数
     )
 
-    print(f"✅ 数据加载完成")
+    print(f"数据加载完成")
     print(f"   训练样本批次: {len(train_loader)}")
     print(f"   测试样本批次: {len(test_loader)}")
     print(f"   类别数: {num_classes}")
@@ -53,7 +53,7 @@ def simple_train():
     model = model.to(device)
 
     num_params = sum(p.numel() for p in model.parameters())
-    print(f"✅ 模型创建完成")
+    print(f"模型创建完成")
     print(f"   参数量: {num_params:,}")
 
     # 4. 设置训练参数
@@ -143,7 +143,7 @@ def simple_train():
         'model_state_dict': model.state_dict(),
         'test_accuracy': test_acc,
     }, 'simple_model.pth')
-    print(f"✅ 模型已保存到: simple_model.pth")
+    print(f"模型已保存到: simple_model.pth")
 
     # 7. 总结
     print("\n" + "=" * 60)
@@ -163,6 +163,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         print("\n\n训练被用户中断")
     except Exception as e:
-        print(f"\n❌ 训练出错: {e}")
+        print(f"\n训练出错: {e}")
         import traceback
         traceback.print_exc()

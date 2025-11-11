@@ -17,7 +17,7 @@ def print_model_structure():
 
     model = create_mamba_spike_nmnist()
 
-    print("📊 Model Summary")
+    print("Model Summary")
     print("-" * 80)
 
     total_params = 0
@@ -47,7 +47,7 @@ def print_layer_details():
 
     model = create_mamba_spike_nmnist()
 
-    print("🔍 Layer-by-Layer Breakdown")
+    print("Layer-by-Layer Breakdown")
     print("-" * 80)
 
     for idx, (name, module) in enumerate(model.named_modules()):
@@ -82,7 +82,7 @@ def visualize_data_flow():
     model = create_mamba_spike_nmnist()
     model.eval()
 
-    print("📐 Dimension Changes Through Network")
+    print("Dimension Changes Through Network")
     print("-" * 80)
     print(f"{'Layer':<40s} | {'Output Shape':<30s}")
     print("-" * 80)
@@ -134,7 +134,7 @@ def analyze_parameters():
 
     model = create_mamba_spike_nmnist()
 
-    print("📊 Parameter Distribution by Component")
+    print("Parameter Distribution by Component")
     print("-" * 80)
 
     components = {
@@ -257,7 +257,7 @@ def print_ascii_architecture():
 def main():
     """主函数"""
     print("\n")
-    print("🔍 Mamba-Spike Architecture Visualization")
+    print("Mamba-Spike Architecture Visualization")
     print("=" * 80)
     print()
 
@@ -279,10 +279,10 @@ def main():
         print_layer_details()
 
     print("\n" + "=" * 80)
-    print("✅ 可视化完成!")
+    print("可视化完成!")
     print("=" * 80)
     print()
-    print("💡 提示:")
+    print("提示:")
     print("  1. 使用 draw.io 打开 architecture/mamba_spike_architecture.drawio")
     print("  2. 查看 architecture/README.md 了解更多细节")
     print("  3. 参考 models/mamba_spike.py 查看代码实现")

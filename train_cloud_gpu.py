@@ -10,11 +10,11 @@ import torch
 def check_cuda():
     """检查CUDA环境"""
     print("=" * 70)
-    print("🚀 云端GPU训练配置检测")
+    print("云端GPU训练配置检测")
     print("=" * 70)
 
     if not torch.cuda.is_available():
-        print("❌ CUDA不可用!")
+        print("CUDA不可用!")
         print("\n可能原因:")
         print("  1. 没有NVIDIA GPU")
         print("  2. CUDA驱动未安装")
@@ -23,14 +23,14 @@ def check_cuda():
         print("  pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118")
         sys.exit(1)
 
-    print(f"✅ CUDA可用")
-    print(f"✅ CUDA版本: {torch.version.cuda}")
-    print(f"✅ PyTorch版本: {torch.__version__}")
-    print(f"✅ GPU数量: {torch.cuda.device_count()}")
+    print(f"CUDA可用")
+    print(f"CUDA版本: {torch.version.cuda}")
+    print(f"PyTorch版本: {torch.__version__}")
+    print(f"GPU数量: {torch.cuda.device_count()}")
 
     for i in range(torch.cuda.device_count()):
         props = torch.cuda.get_device_properties(i)
-        print(f"\n📊 GPU {i}: {props.name}")
+        print(f"\nGPU {i}: {props.name}")
         print(f"   显存: {props.total_memory / 1024**3:.1f} GB")
         print(f"   计算能力: {props.major}.{props.minor}")
         print(f"   多处理器: {props.multi_processor_count}")
@@ -44,16 +44,16 @@ def get_optimized_config(gpu_name, dataset):
 
     # GPU配置映射
     gpu_configs = {
-        'RTX 5090': {'batch_size': 128, 'workers': 8, 'note': '🔥 顶级性能'},
-        'RTX 4090': {'batch_size': 96, 'workers': 8, 'note': '⚡ 极高性能'},
-        'RTX 3090': {'batch_size': 64, 'workers': 6, 'note': '💪 高性能'},
-        'A100': {'batch_size': 128, 'workers': 8, 'note': '🏆 专业级'},
-        'V100': {'batch_size': 64, 'workers': 6, 'note': '🎯 高性能'},
-        'T4': {'batch_size': 32, 'workers': 4, 'note': '✅ 良好性能'},
+        'RTX 5090': {'batch_size': 128, 'workers': 8, 'note': '顶级性能'},
+        'RTX 4090': {'batch_size': 96, 'workers': 8, 'note': '极高性能'},
+        'RTX 3090': {'batch_size': 64, 'workers': 6, 'note': '高性能'},
+        'A100': {'batch_size': 128, 'workers': 8, 'note': '专业级'},
+        'V100': {'batch_size': 64, 'workers': 6, 'note': '高性能'},
+        'T4': {'batch_size': 32, 'workers': 4, 'note': '良好性能'},
     }
 
     # 检测GPU型号
-    config = {'batch_size': 32, 'workers': 4, 'note': '✓ 标准配置'}
+    config = {'batch_size': 32, 'workers': 4, 'note': '标准配置'}
 
     for key in gpu_configs:
         if key.lower() in gpu_name.lower():
@@ -150,7 +150,7 @@ def main():
         args.num_workers = config['workers']
 
     # 显示配置信息
-    print("\n💡 云端GPU训练配置")
+    print("\n云端GPU训练配置")
     print("=" * 70)
     print(f"  GPU: {gpu_name} {config['note']}")
     print(f"  数据集: {args.dataset}")
@@ -162,18 +162,18 @@ def main():
 
     # 估算训练时间
     est_time = estimate_training_time(gpu_name, args.dataset, args.epochs)
-    print(f"\n⏱️  预计训练时间: {est_time}")
+    print(f"\n 预计训练时间: {est_time}")
     print("=" * 70)
 
     # 性能提示
-    print("\n🚀 性能优化提示:")
-    print("  ✓ 使用大batch size充分利用GPU")
-    print("  ✓ 启用混合精度训练（如果支持）")
-    print("  ✓ 使用多线程数据加载")
-    print("  ✓ 确保数据在SSD上以加快加载速度")
+    print("\n性能优化提示:")
+    print("  使用大batch size充分利用GPU")
+    print("  启用混合精度训练（如果支持）")
+    print("  使用多线程数据加载")
+    print("  确保数据在SSD上以加快加载速度")
     print("=" * 70)
 
-    print("\n🎯 开始训练...")
+    print("\n开始训练...")
     print("=" * 70)
 
     # 导入训练模块
@@ -192,19 +192,19 @@ def main():
     try:
         trainer.train()
     except KeyboardInterrupt:
-        print("\n\n⚠️  训练被用户中断")
+        print("\n\n 训练被用户中断")
         print(f"已保存的checkpoint可以在 {args.output_dir} 找到")
     except Exception as e:
-        print(f"\n❌ 训练出错: {e}")
+        print(f"\n训练出错: {e}")
         import traceback
         traceback.print_exc()
 
     print("\n" + "=" * 70)
-    print("✅ 训练完成！")
+    print("训练完成！")
     print("=" * 70)
 
     # 显示后续步骤
-    print("\n📊 后续步骤:")
+    print("\n后续步骤:")
     print(f"1. 查看TensorBoard: tensorboard --logdir={args.output_dir}")
     print(f"2. 评估模型: python evaluate.py --checkpoint {args.output_dir}/.../checkpoint_best.pth")
     print(f"3. 下载结果: 打包outputs目录")
