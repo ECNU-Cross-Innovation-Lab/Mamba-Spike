@@ -1,0 +1,73 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# PyTorch
+*.pth
+*.pt
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# Data
+data/*/
+!data/dataset_loader.py
+
+# Outputs
+outputs/
+fast_experiments/
+logs/
+runs/
+tensorboard/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Temporary files
+*.log
+*.tmp
+temp/
+tmp/
+
+# Experiments
+*_experiment.py
+analyze_results.py
+verify_setup.py
+test_implementation.py
+experiment_report.md
+IMPLEMENTATION_SUMMARY.md
+FINAL_SUMMARY.md
+run_experiments.sh
