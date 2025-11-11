@@ -1,11 +1,12 @@
 # Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End
 
-[![arXiv](https://img.shields.io/badge/arXiv-2408.11823-b31b1b.svg)](https://arxiv.org/abs/2408.11823)
+[![CGI 2024](https://img.shields.io/badge/CGI_2024-Published-success)](https://doi.org/10.1007/978-3-031-82021-2_23)
+[![DOI](https://img.shields.io/badge/DOI-10.1007/978--3--031--82021--2__23-blue)](https://doi.org/10.1007/978-3-031-82021-2_23)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is a PyTorch implementation of the paper **"Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing"** ([arXiv:2408.11823](https://arxiv.org/abs/2408.11823)).
+This is a PyTorch implementation of the paper **"Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing"** published in CGI 2024 (Computer Graphics International Conference).
 
 ## Overview
 
@@ -98,13 +99,6 @@ Performance comparison on various neuromorphic datasets:
 | Sequential MNIST| **99.4%**   | 99.3% | -       | -       | -            |
 | CIFAR10-DVS     | **92.5%**   | 91.8% | 87.3%   | 89.6%   | 91.2%        |
 
-### Key Findings
-
-- **Higher Accuracy**: Mamba-Spike consistently outperforms baseline models across all datasets
-- **Lower Latency**: 15ms on Sequential MNIST vs. 18ms (Mamba), 25ms (LSTM), 22ms (GRU)
-- **Energy Efficiency**: 785 spikes per sample on DVS Gesture vs. 987-1245 for other SNN methods
-- **Robustness**: Improved performance on noisy and perturbated inputs
-
 ## Project Structure
 
 ```
@@ -126,36 +120,27 @@ mambaspike/
 3. **Multi-Scale Architecture**: Supports different input resolutions
 4. **Flexible Training**: Easy to adapt for different neuromorphic datasets
 
-## Implementation Notes
-
-- Since `mamba-ssm` package had installation issues, we implemented the core SSM functionality manually
-- The implementation follows the paper's architecture closely but may have minor differences
-- Training uses mixed precision by default when GPU is available
-- Gradient clipping is applied to stabilize training
-
 ## Citation
 
-If you use this code in your research, please cite the original paper:
+If you use this code in your research, please cite:
 
 ```bibtex
-@article{qin2024mambaspike,
+@inproceedings{qin2025mambaspike,
   title={Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing},
   author={Qin, Jiahao and Liu, Feng},
-  journal={arXiv preprint arXiv:2408.11823},
-  year={2024}
+  booktitle={Advances in Computer Graphics: 41st Computer Graphics International Conference, CGI 2024},
+  pages={303--315},
+  year={2025},
+  publisher={Springer},
+  address={Cham},
+  series={Lecture Notes in Computer Science},
+  volume={15339},
+  doi={10.1007/978-3-031-82021-2_23},
+  url={https://doi.org/10.1007/978-3-031-82021-2_23}
 }
 ```
 
-## Acknowledgements
-
-This implementation is based on:
-- [Mamba: Linear-Time Sequence Modeling with Selective State Spaces](https://arxiv.org/abs/2312.00752)
-- [snnTorch: Deep and Online Learning with Spiking Neural Networks](https://github.com/jeshraghian/snntorch)
-- [Tonic: Event-based Datasets and Transformations](https://github.com/neuromorphs/tonic)
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
+**Reference**: Qin, J., Liu, F. (2025). Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing. In: Magnenat-Thalmann, N., Kim, J., Sheng, B., Deng, Z., Thalmann, D., Li, P. (eds) Advances in Computer Graphics. CGI 2024. Lecture Notes in Computer Science, vol 15339. Springer, Cham. https://doi.org/10.1007/978-3-031-82021-2_23
 
 ## License
 
