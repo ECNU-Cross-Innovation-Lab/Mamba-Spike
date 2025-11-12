@@ -17,12 +17,14 @@ from tqdm import tqdm
 from data.dataset_loader import (
     prepare_nmnist_dataset,
     prepare_dvsgesture_dataset,
-    prepare_cifar10dvs_dataset
+    prepare_cifar10dvs_dataset,
+    prepare_sequential_mnist_dataset
 )
 from models.mamba_spike import (
     create_mamba_spike_nmnist,
     create_mamba_spike_dvsgesture,
-    create_mamba_spike_cifar10dvs
+    create_mamba_spike_cifar10dvs,
+    create_mamba_spike_sequential_mnist
 )
 
 
@@ -104,6 +106,14 @@ class Trainer:
                 dt=self.args.dt,
                 num_workers=self.args.num_workers
             )
+        elif self.args.dataset == 'sequential_mnist':
+            return prepare_sequential_mnist_dataset(
+                data_dir=self.args.data_dir,
+                batch_size=self.args.batch_size,
+                time_steps=int(self.args.time_window / self.args.dt),
+                dt=self.args.dt / 1000.0,  # Convert to probability scale
+                num_workers=self.args.num_workers
+            )
         else:
             raise ValueError(f"Unknown dataset: {self.args.dataset}")
     
@@ -115,6 +125,8 @@ class Trainer:
             return create_mamba_spike_dvsgesture(num_classes=self.num_classes)
         elif self.args.dataset == 'cifar10dvs':
             return create_mamba_spike_cifar10dvs(num_classes=self.num_classes)
+        elif self.args.dataset == 'sequential_mnist':
+            return create_mamba_spike_sequential_mnist(num_classes=self.num_classes)
         else:
             raise ValueError(f"Unknown dataset: {self.args.dataset}")
     
@@ -253,7 +265,7 @@ def main():
     
     # Dataset
     parser.add_argument('--dataset', type=str, default='nmnist',
-                        choices=['nmnist', 'dvsgesture', 'cifar10dvs'],
+                        choices=['nmnist', 'dvsgesture', 'cifar10dvs', 'sequential_mnist'],
                         help='Dataset to use')
     parser.add_argument('--data-dir', type=str, default='./data',
                         help='Directory to save datasets')

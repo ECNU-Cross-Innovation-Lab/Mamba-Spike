@@ -1,14 +1,16 @@
 """
 Dataset loader for neuromorphic datasets using tonic library.
-Supports N-MNIST, DVS Gesture, CIFAR10-DVS datasets.
+Supports N-MNIST, DVS Gesture, CIFAR10-DVS, and Sequential MNIST datasets.
 """
 
 import os
 import torch
 import numpy as np
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Dataset
 import tonic
 import tonic.transforms as transforms
+from torchvision import datasets as torch_datasets
+from torchvision import transforms as torch_transforms
 from typing import Optional, Tuple, Dict
 
 
@@ -146,6 +148,139 @@ class NeuromorphicDataset:
             print(f"Download completed!")
         else:
             print(f"{self.dataset_name} dataset already exists at {save_path}")
+
+
+class SequentialMNIST(Dataset):
+    """
+    Sequential MNIST dataset for testing temporal modeling.
+    Converts standard MNIST images to spike trains using rate coding.
+    According to paper: Tests long-range temporal dependency modeling.
+    """
+
+    def __init__(
+        self,
+        root: str = "./data",
+        train: bool = True,
+        time_steps: int = 100,
+        dt: float = 1.0,
+        download: bool = True
+    ):
+        self.time_steps = time_steps
+        self.dt = dt
+
+        # Load standard MNIST
+        transform = torch_transforms.Compose([
+            torch_transforms.ToTensor(),
+            torch_transforms.Normalize((0.1307,), (0.3081,))  # MNIST normalization
+        ])
+
+        self.mnist = torch_datasets.MNIST(
+            root=root,
+            train=train,
+            download=download,
+            transform=transform
+        )
+
+    def __len__(self):
+        return len(self.mnist)
+
+    def __getitem__(self, idx):
+        image, label = self.mnist[idx]
+
+        # image shape: (1, 28, 28), values normalized
+        # Convert to spike train using rate coding
+        spikes = self._image_to_spikes(image)
+
+        # spikes shape: (time_steps, 2, 28, 28)
+        # Using 2 channels to match DVS format (ON/OFF events)
+        return spikes, label
+
+    def _image_to_spikes(self, image):
+        """
+        Convert image to spike train using rate coding.
+        Higher pixel intensity = higher spike probability
+        """
+        # Denormalize and get pixel intensities in [0, 1]
+        pixel_values = (image + 0.1307 / 0.3081) * 0.3081
+        pixel_values = torch.clamp(pixel_values, 0, 1)
+
+        # Generate spikes over time using Poisson process
+        # Higher intensity = more spikes
+        spikes_list = []
+
+        for t in range(self.time_steps):
+            # Sample spikes based on pixel intensity (rate coding)
+            spike_prob = pixel_values * self.dt  # Scale by time step
+            spikes_on = torch.bernoulli(spike_prob)  # ON events
+
+            # Create OFF events as inverse (for contrast)
+            spikes_off = torch.bernoulli((1 - pixel_values) * self.dt * 0.5)
+
+            # Stack ON and OFF channels
+            spikes_t = torch.cat([spikes_on, spikes_off], dim=0)  # (2, 28, 28)
+            spikes_list.append(spikes_t)
+
+        # Stack time steps: (time_steps, 2, 28, 28)
+        spikes = torch.stack(spikes_list, dim=0)
+
+        return spikes.float()
+
+
+def prepare_sequential_mnist_dataset(
+    data_dir: str = "./data",
+    batch_size: int = 32,
+    time_steps: int = 100,
+    dt: float = 0.1,
+    num_workers: int = 4
+) -> Tuple[DataLoader, DataLoader, int]:
+    """
+    Prepare Sequential MNIST dataset for testing temporal modeling.
+
+    Args:
+        data_dir: Directory to save/load data
+        batch_size: Batch size for training
+        time_steps: Number of time steps for spike encoding
+        dt: Time resolution for spike encoding
+        num_workers: Number of data loading workers
+
+    Returns:
+        train_loader, test_loader, num_classes
+    """
+    # Create datasets
+    train_dataset = SequentialMNIST(
+        root=data_dir,
+        train=True,
+        time_steps=time_steps,
+        dt=dt,
+        download=True
+    )
+
+    test_dataset = SequentialMNIST(
+        root=data_dir,
+        train=False,
+        time_steps=time_steps,
+        dt=dt,
+        download=True
+    )
+
+    # Create data loaders
+    train_loader = DataLoader(
+        train_dataset,
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers,
+        pin_memory=True
+    )
+
+    test_loader = DataLoader(
+        test_dataset,
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers,
+        pin_memory=True
+    )
+
+    return train_loader, test_loader, 10  # MNIST has 10 classes
 
 
 def prepare_nmnist_dataset(

@@ -189,33 +189,44 @@ class MambaBlock(nn.Module):
 class SpikingFrontEnd(nn.Module):
     """
     Spiking front-end for encoding event data into spikes.
-    Uses Leaky Integrate-and-Fire (LIF) neurons.
+    Uses Leaky Integrate-and-Fire (LIF) neurons with recurrent connections.
+    According to paper: "Temporal feature extraction is achieved through
+    recurrent connections and temporal pooling mechanisms" (Page 6)
     """
-    
+
     def __init__(
         self,
         in_channels: int,
         hidden_channels: int,
         out_channels: int,
         kernel_size: int = 3,
-        beta: float = 0.9,
-        spike_grad: Optional[object] = None
+        beta: float = 0.97,  # Adjusted for ~30ms time constant (paper Fig 5)
+        spike_grad: Optional[object] = None,
+        use_recurrent: bool = True
     ):
         super().__init__()
-        
+
         if spike_grad is None:
             spike_grad = surrogate.fast_sigmoid(slope=25)
-        
+
+        self.use_recurrent = use_recurrent
+
         # Convolutional layers
         self.conv1 = nn.Conv2d(in_channels, hidden_channels, kernel_size, padding=kernel_size//2)
         self.lif1 = snn.Leaky(beta=beta, spike_grad=spike_grad)
-        
+
         self.conv2 = nn.Conv2d(hidden_channels, hidden_channels, kernel_size, padding=kernel_size//2)
         self.lif2 = snn.Leaky(beta=beta, spike_grad=spike_grad)
-        
+
         self.conv3 = nn.Conv2d(hidden_channels, out_channels, kernel_size, padding=kernel_size//2)
         self.lif3 = snn.Leaky(beta=beta, spike_grad=spike_grad)
-        
+
+        # Recurrent connections for temporal feature extraction (paper requirement)
+        if use_recurrent:
+            self.recurrent1 = nn.Conv2d(hidden_channels, hidden_channels, 1)
+            self.recurrent2 = nn.Conv2d(hidden_channels, hidden_channels, 1)
+            self.recurrent3 = nn.Conv2d(out_channels, out_channels, 1)
+
         # Pooling
         self.pool = nn.MaxPool2d(2)
         
@@ -228,84 +239,97 @@ class SpikingFrontEnd(nn.Module):
             membrane: final membrane potential
         """
         batch_size, time_steps, _, _, _ = x.shape
-        
+
         # Initialize membrane potentials
         mem1 = self.lif1.init_leaky()
         mem2 = self.lif2.init_leaky()
         mem3 = self.lif3.init_leaky()
-        
+
+        # Initialize previous spikes for recurrent connections
+        spk1_prev = None
+        spk2_prev = None
+        spk3_prev = None
+
         spk_rec = []
-        
-        # Process each time step
+
+        # Process each time step with recurrent connections
         for t in range(time_steps):
             x_t = x[:, t]
-            
-            # Layer 1
+
+            # Layer 1 with recurrent connection
             cur1 = self.pool(self.conv1(x_t))
+            if self.use_recurrent and spk1_prev is not None:
+                cur1 = cur1 + self.recurrent1(spk1_prev)
             spk1, mem1 = self.lif1(cur1, mem1)
-            
-            # Layer 2
+            spk1_prev = spk1
+
+            # Layer 2 with recurrent connection
             cur2 = self.pool(self.conv2(spk1))
+            if self.use_recurrent and spk2_prev is not None:
+                cur2 = cur2 + self.recurrent2(spk2_prev)
             spk2, mem2 = self.lif2(cur2, mem2)
-            
-            # Layer 3
+            spk2_prev = spk2
+
+            # Layer 3 with recurrent connection
             cur3 = self.conv3(spk2)
+            if self.use_recurrent and spk3_prev is not None:
+                cur3 = cur3 + self.recurrent3(spk3_prev)
             spk3, mem3 = self.lif3(cur3, mem3)
-            
+            spk3_prev = spk3
+
             spk_rec.append(spk3)
-        
+
         # Stack spikes
         spikes = torch.stack(spk_rec, dim=1)  # (B, T, C, H, W)
-        
+
         return spikes, mem3
 
 
 class SpikeToActivation(nn.Module):
     """
     Interface layer to convert spikes to continuous activations.
+    According to paper (Page 7): "The conversion mechanism accumulates the
+    spike events over a fixed time window and normalizes the resulting
+    activation based on the firing rates of the spiking neurons"
     """
-    
-    def __init__(self, method: str = "rate"):
+
+    def __init__(self, time_window: int = 5):
         super().__init__()
-        self.method = method
-        
+        self.time_window = time_window
+
     def forward(self, spikes: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            spikes: (B, T, C, H, W) tensor of spikes
+            spikes: (B, T, C, H, W) tensor of spikes (binary values)
         Returns:
-            activations: (B, T, D) tensor of activations
+            activations: (B, T, D) tensor of activations (continuous values)
         """
-        if self.method == "rate":
-            # Rate coding: average spike count over spatial dimensions
-            batch_size, time_steps, channels, height, width = spikes.shape
-            # Flatten spatial dimensions
-            activations = spikes.view(batch_size, time_steps, -1)
-            # Apply temporal smoothing
-            # Ensure we have the right dimensions for conv1d
-            # activations shape: (batch, time, features)
-            batch_size, time_steps, num_features = activations.shape
-            
-            # Create kernel for each feature channel
-            kernel = torch.ones(num_features, 1, 5, device=spikes.device) / 5
-            
-            # Transpose for conv1d: (batch, features, time)
-            activations = activations.transpose(1, 2)
-            
-            # Apply convolution with groups=num_features
-            activations = F.conv1d(
-                activations,
-                kernel,
-                padding=2,
-                groups=num_features
-            )
-            
-            # Transpose back: (batch, time, features)
-            activations = activations.transpose(1, 2)
-        else:
-            raise ValueError(f"Unknown method: {self.method}")
-        
-        return activations
+        batch_size, time_steps, channels, height, width = spikes.shape
+
+        # Flatten spatial dimensions: (B, T, C*H*W)
+        spikes_flat = spikes.view(batch_size, time_steps, -1)
+
+        # Accumulate spikes over fixed time window
+        # Pad the temporal dimension to handle boundaries
+        padded = F.pad(spikes_flat, (0, 0, self.time_window - 1, 0))
+
+        # Transpose for unfold operation: (B, D, T+pad)
+        padded = padded.transpose(1, 2)
+
+        # Create sliding windows: (B, D, T, window_size)
+        windows = padded.unfold(dimension=2, size=self.time_window, step=1)
+
+        # Sum over time window: (B, D, T)
+        spike_counts = windows.sum(dim=-1)
+
+        # Transpose back: (B, T, D)
+        spike_counts = spike_counts.transpose(1, 2)
+
+        # Normalize by firing rate (spike_count / time_window)
+        # This gives the average firing rate over the time window
+        firing_rates = spike_counts.float() / self.time_window
+
+        return firing_rates
 
 
 class MambaSpike(nn.Module):
@@ -340,7 +364,7 @@ class MambaSpike(nn.Module):
         spike_features = spiking_channels * h_out * w_out
         
         # Interface layer
-        self.spike_to_activation = SpikeToActivation(method="rate")
+        self.spike_to_activation = SpikeToActivation(time_window=5)
         
         # Project to model dimension
         self.input_proj = nn.Linear(spike_features, d_model)
@@ -395,7 +419,21 @@ def create_mamba_spike_nmnist(num_classes: int = 10) -> MambaSpike:
         d_model=128,
         n_layers=4,
         d_state=16,
-        beta=0.9,
+        beta=0.97,  # 30ms time constant per paper Fig 5
+    )
+
+
+def create_mamba_spike_sequential_mnist(num_classes: int = 10) -> MambaSpike:
+    """Create Mamba-Spike model for Sequential MNIST dataset."""
+    return MambaSpike(
+        input_channels=2,
+        input_size=(28, 28),  # Standard MNIST size
+        num_classes=num_classes,
+        spiking_channels=64,
+        d_model=128,
+        n_layers=4,
+        d_state=16,
+        beta=0.97,  # 30ms time constant per paper Fig 5
     )
 
 
@@ -409,7 +447,7 @@ def create_mamba_spike_dvsgesture(num_classes: int = 11) -> MambaSpike:
         d_model=256,
         n_layers=6,
         d_state=16,
-        beta=0.9,
+        beta=0.97,  # 30ms time constant per paper Fig 5
     )
 
 
@@ -423,7 +461,7 @@ def create_mamba_spike_cifar10dvs(num_classes: int = 10) -> MambaSpike:
         d_model=256,
         n_layers=6,
         d_state=16,
-        beta=0.9,
+        beta=0.97,  # 30ms time constant per paper Fig 5
     )
 
 
