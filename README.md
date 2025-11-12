@@ -33,8 +33,6 @@ This implementation strictly follows the paper specifications:
 - **Spike-to-Activation** (Page 7): Implements fixed time window accumulation with firing rate normalization
 - **Sequential MNIST** (Table 1): Full support with rate coding conversion from standard MNIST
 
-See [PAPER_COMPLIANCE.md](PAPER_COMPLIANCE.md) for detailed documentation of all modifications and verification results.
-
 ## Setup
 
 ### 1. Environment Setup
@@ -92,21 +90,6 @@ python train.py --dataset sequential_mnist --epochs 100 --batch-size 64
 - `--dt`: Time bin in microseconds (default: 1000)
 - `--output-dir`: Directory to save outputs (default: ./outputs)
 
-## Testing
-
-### Verification Test
-Run the comprehensive test suite to verify paper compliance:
-```bash
-python test_sequential_mnist.py
-```
-
-This will test:
-- Recurrent connections in spiking front-end
-- LIF time constant (30ms as per paper Figure 5)
-- Spike-to-activation interface (fixed time window + firing rate normalization)
-- Sequential MNIST data loading and forward pass
-- Training loop with gradient flow
-
 ## Evaluation
 
 To evaluate a trained model:
@@ -141,8 +124,6 @@ mambaspike/
 │   └── mamba_spike.py         # Model architecture (paper-compliant)
 ├── train.py                   # Training script
 ├── evaluate.py                # Evaluation script
-├── test_sequential_mnist.py   # Sequential MNIST test suite
-├── PAPER_COMPLIANCE.md        # Paper compliance documentation
 ├── requirements.txt           # Dependencies
 └── README.md                  # This file
 ```
@@ -154,7 +135,7 @@ mambaspike/
 3. **Efficient Temporal Processing**: Leverages Mamba's selective state spaces for O(L) complexity
 4. **Neuromorphic Data Support**: Native processing of event-based data (DVS cameras, Sequential MNIST)
 5. **Multi-Scale Architecture**: Supports different input resolutions (28×28 to 128×128)
-6. **Comprehensive Testing**: Includes verification suite for paper compliance
+6. **Flexible Training**: Easy to adapt for different neuromorphic datasets
 
 ## Citation
 
