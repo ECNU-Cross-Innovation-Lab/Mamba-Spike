@@ -19,10 +19,21 @@ Mamba-Spike is a novel neuromorphic architecture that integrates a spiking front
 
 ### Architecture Components
 
-1. **Spiking Front-End**: Uses Leaky Integrate-and-Fire (LIF) neurons to encode event-based data into sparse spike representations
-2. **Interface Layer**: Converts spikes to continuous activations while preserving temporal information
+1. **Spiking Front-End**: Uses Leaky Integrate-and-Fire (LIF) neurons with recurrent connections to encode event-based data into sparse spike representations
+2. **Interface Layer**: Converts spikes to continuous activations using fixed time window accumulation and firing rate normalization
 3. **Mamba Backbone**: Processes temporal sequences using selective state space models with linear-time complexity
 4. **Classification Head**: Outputs class predictions with layer normalization
+
+### Paper Compliance
+
+This implementation strictly follows the paper specifications:
+
+- **Recurrent Connections** (Page 6): Added to spiking front-end for temporal feature extraction
+- **LIF Time Constant** (Figure 5): Optimized to τ ≈ 30ms (beta=0.97) for best performance
+- **Spike-to-Activation** (Page 7): Implements fixed time window accumulation with firing rate normalization
+- **Sequential MNIST** (Table 1): Full support with rate coding conversion from standard MNIST
+
+See [PAPER_COMPLIANCE.md](PAPER_COMPLIANCE.md) for detailed documentation of all modifications and verification results.
 
 ## Setup
 
@@ -38,10 +49,11 @@ pip install -r requirements.txt
 
 ### 2. Dataset Preparation
 
-The project supports three neuromorphic datasets:
+The project supports four neuromorphic datasets:
 - **N-MNIST**: Neuromorphic version of MNIST (34x34 resolution)
-- **DVS Gesture**: Dynamic hand gestures (128x128 resolution) 
+- **DVS Gesture**: Dynamic hand gestures (128x128 resolution)
 - **CIFAR10-DVS**: Neuromorphic version of CIFAR-10 (128x128 resolution)
+- **Sequential MNIST**: Standard MNIST converted to spike trains (28x28 resolution)
 
 Datasets will be automatically downloaded when running the training script.
 
@@ -64,9 +76,14 @@ To train on CIFAR10-DVS:
 python train.py --dataset cifar10dvs --epochs 200 --batch-size 32 --lr 1e-3
 ```
 
+To train on Sequential MNIST:
+```bash
+python train.py --dataset sequential_mnist --epochs 100 --batch-size 64
+```
+
 ### Training Parameters
 
-- `--dataset`: Choose from `nmnist`, `dvsgesture`, `cifar10dvs`
+- `--dataset`: Choose from `nmnist`, `dvsgesture`, `cifar10dvs`, `sequential_mnist`
 - `--epochs`: Number of training epochs
 - `--batch-size`: Batch size for training
 - `--lr`: Learning rate (default: 1e-3)
@@ -74,6 +91,21 @@ python train.py --dataset cifar10dvs --epochs 200 --batch-size 32 --lr 1e-3
 - `--time-window`: Time window in microseconds (default: 300000)
 - `--dt`: Time bin in microseconds (default: 1000)
 - `--output-dir`: Directory to save outputs (default: ./outputs)
+
+## Testing
+
+### Verification Test
+Run the comprehensive test suite to verify paper compliance:
+```bash
+python test_sequential_mnist.py
+```
+
+This will test:
+- Recurrent connections in spiking front-end
+- LIF time constant (30ms as per paper Figure 5)
+- Spike-to-activation interface (fixed time window + firing rate normalization)
+- Sequential MNIST data loading and forward pass
+- Training loop with gradient flow
 
 ## Evaluation
 
@@ -104,21 +136,25 @@ Performance comparison on various neuromorphic datasets:
 ```
 mambaspike/
 ├── data/
-│   └── dataset_loader.py      # Dataset loading utilities
+│   └── dataset_loader.py      # Dataset loading utilities (includes Sequential MNIST)
 ├── models/
-│   └── mamba_spike.py         # Model architecture
+│   └── mamba_spike.py         # Model architecture (paper-compliant)
 ├── train.py                   # Training script
 ├── evaluate.py                # Evaluation script
+├── test_sequential_mnist.py   # Sequential MNIST test suite
+├── PAPER_COMPLIANCE.md        # Paper compliance documentation
 ├── requirements.txt           # Dependencies
 └── README.md                  # This file
 ```
 
 ## Key Features
 
-1. **Efficient Temporal Processing**: Leverages Mamba's selective state spaces for long sequences
-2. **Neuromorphic Front-End**: Native processing of event-based data
-3. **Multi-Scale Architecture**: Supports different input resolutions
-4. **Flexible Training**: Easy to adapt for different neuromorphic datasets
+1. **Paper-Compliant Implementation**: Strictly follows all architectural specifications from the CGI 2024 paper
+2. **Recurrent Spiking Front-End**: Temporal feature extraction through recurrent connections (30ms time constant)
+3. **Efficient Temporal Processing**: Leverages Mamba's selective state spaces for O(L) complexity
+4. **Neuromorphic Data Support**: Native processing of event-based data (DVS cameras, Sequential MNIST)
+5. **Multi-Scale Architecture**: Supports different input resolutions (28×28 to 128×128)
+6. **Comprehensive Testing**: Includes verification suite for paper compliance
 
 ## Citation
 
