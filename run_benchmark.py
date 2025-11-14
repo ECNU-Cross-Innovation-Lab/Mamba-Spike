@@ -200,9 +200,9 @@ class BenchmarkRunner:
 def main():
     parser = argparse.ArgumentParser(description='Run benchmark on DVS Gesture and CIFAR10-DVS')
     parser.add_argument('--epochs', type=int, default=4, help='Number of epochs per dataset')
-    parser.add_argument('--batch-size-dvsgesture', type=int, default=16,
+    parser.add_argument('--batch-size-dvsgesture', type=int, default=2,
                        help='Batch size for DVS Gesture')
-    parser.add_argument('--batch-size-cifar10dvs', type=int, default=16,
+    parser.add_argument('--batch-size-cifar10dvs', type=int, default=2,
                        help='Batch size for CIFAR10-DVS')
     parser.add_argument('--output-dir', type=str, default='benchmark_results',
                        help='Output directory for results')

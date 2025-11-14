@@ -14,8 +14,8 @@ echo Estimated time: 20-40 minutes (depends on GPU)
 echo.
 pause
 
-REM Run benchmark
-python run_benchmark.py --epochs 4 --batch-size-dvsgesture 16 --batch-size-cifar10dvs 16
+REM Run benchmark with batch size 2 (safe for most GPUs)
+python run_benchmark.py --epochs 4
 
 echo.
 echo ====================================================================
