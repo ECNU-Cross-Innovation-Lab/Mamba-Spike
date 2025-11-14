@@ -84,13 +84,27 @@ class NeuromorphicDataset:
     def get_train_loader(self, batch_size: int = 32, shuffle: bool = True, num_workers: int = 4):
         """Get training data loader."""
         dataset_class = self.dataset_configs[self.dataset_name]['class']
-        
-        train_dataset = dataset_class(
-            save_to=os.path.join(self.data_dir, self.dataset_name),
-            train=True,
-            transform=self.transforms
-        )
-        
+
+        # CIFAR10DVS doesn't have train/test split parameter
+        if self.dataset_name == 'cifar10dvs':
+            full_dataset = dataset_class(
+                save_to=os.path.join(self.data_dir, self.dataset_name),
+                transform=self.transforms
+            )
+            # Split manually: use first 90% for training
+            train_size = int(0.9 * len(full_dataset))
+            train_dataset, _ = torch.utils.data.random_split(
+                full_dataset,
+                [train_size, len(full_dataset) - train_size],
+                generator=torch.Generator().manual_seed(42)
+            )
+        else:
+            train_dataset = dataset_class(
+                save_to=os.path.join(self.data_dir, self.dataset_name),
+                train=True,
+                transform=self.transforms
+            )
+
         return DataLoader(
             train_dataset,
             batch_size=batch_size,
@@ -103,13 +117,27 @@ class NeuromorphicDataset:
     def get_test_loader(self, batch_size: int = 32, shuffle: bool = False, num_workers: int = 4):
         """Get test data loader."""
         dataset_class = self.dataset_configs[self.dataset_name]['class']
-        
-        test_dataset = dataset_class(
-            save_to=os.path.join(self.data_dir, self.dataset_name),
-            train=False,
-            transform=self.transforms
-        )
-        
+
+        # CIFAR10DVS doesn't have train/test split parameter
+        if self.dataset_name == 'cifar10dvs':
+            full_dataset = dataset_class(
+                save_to=os.path.join(self.data_dir, self.dataset_name),
+                transform=self.transforms
+            )
+            # Split manually: use last 10% for testing
+            train_size = int(0.9 * len(full_dataset))
+            _, test_dataset = torch.utils.data.random_split(
+                full_dataset,
+                [train_size, len(full_dataset) - train_size],
+                generator=torch.Generator().manual_seed(42)
+            )
+        else:
+            test_dataset = dataset_class(
+                save_to=os.path.join(self.data_dir, self.dataset_name),
+                train=False,
+                transform=self.transforms
+            )
+
         return DataLoader(
             test_dataset,
             batch_size=batch_size,
@@ -139,12 +167,16 @@ class NeuromorphicDataset:
         """Download dataset if not already present."""
         dataset_class = self.dataset_configs[self.dataset_name]['class']
         save_path = os.path.join(self.data_dir, self.dataset_name)
-        
+
         if not os.path.exists(save_path):
             print(f"Downloading {self.dataset_name} dataset...")
-            # This will trigger download
-            _ = dataset_class(save_to=save_path, train=True)
-            _ = dataset_class(save_to=save_path, train=False)
+            # CIFAR10DVS doesn't have train/test split parameter
+            if self.dataset_name == 'cifar10dvs':
+                _ = dataset_class(save_to=save_path)
+            else:
+                # This will trigger download for datasets with train/test splits
+                _ = dataset_class(save_to=save_path, train=True)
+                _ = dataset_class(save_to=save_path, train=False)
             print(f"Download completed!")
         else:
             print(f"{self.dataset_name} dataset already exists at {save_path}")
@@ -208,7 +240,7 @@ class SequentialMNIST(Dataset):
         # Higher intensity = more spikes
         spikes_list = []
 
-        for t in range(self.time_steps):
+        for _ in range(self.time_steps):
             # Sample spikes based on pixel intensity (rate coding)
             spike_prob = pixel_values * self.dt  # Scale by time step
             spikes_on = torch.bernoulli(spike_prob)  # ON events
