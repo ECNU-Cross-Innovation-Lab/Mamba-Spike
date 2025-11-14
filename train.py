@@ -31,12 +31,7 @@ from models.mamba_spike import (
 class Trainer:
     def __init__(self, args):
         self.args = args
-        if torch.cuda.is_available():
-            self.device = torch.device("cuda")
-        elif torch.backends.mps.is_available():
-            self.device = torch.device("mps")
-        else:
-            self.device = torch.device("cpu")
+        self.device = self._setup_device()
         print(f"Using device: {self.device}")
         
         # Create output directory
@@ -77,7 +72,45 @@ class Trainer:
         
         # Best accuracy tracking
         self.best_acc = 0.0
-        
+
+    def _setup_device(self):
+        """
+        Automatically detect and setup the best available device.
+        Priority: CUDA > MPS > CPU
+        """
+        # Try CUDA (NVIDIA GPUs)
+        if torch.cuda.is_available():
+            device = torch.device("cuda")
+            try:
+                # Test CUDA initialization
+                _ = torch.zeros(1).to(device)
+                gpu_name = torch.cuda.get_device_name(0)
+                gpu_memory = torch.cuda.get_device_properties(0).total_memory / 1024**3
+                print(f"\nGPU detected: {gpu_name}")
+                print(f"GPU memory: {gpu_memory:.1f} GB")
+                print(f"CUDA version: {torch.version.cuda}")
+                return device
+            except Exception as e:
+                print(f"\nWarning: CUDA available but initialization failed: {e}")
+                print("Falling back to CPU...")
+
+        # Try MPS (Apple Silicon)
+        elif torch.backends.mps.is_available():
+            device = torch.device("mps")
+            try:
+                # Test MPS initialization
+                _ = torch.zeros(1).to(device)
+                print(f"\nApple Silicon GPU (MPS) detected")
+                return device
+            except Exception as e:
+                print(f"\nWarning: MPS available but initialization failed: {e}")
+                print("Falling back to CPU...")
+
+        # Fallback to CPU
+        print("\nNo GPU detected, using CPU")
+        print("Note: Training will be slower on CPU. Consider using a GPU for better performance.")
+        return torch.device("cpu")
+
     def _load_dataset(self):
         """Load the specified dataset."""
         print(f"Loading {self.args.dataset} dataset...")
