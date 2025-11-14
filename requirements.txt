@@ -8,6 +8,7 @@ tqdm>=4.62.0
 # Neuromorphic and event-based processing
 tonic>=1.0.0
 snntorch>=0.6.0
+aedat>=2.0.0  # Required for CIFAR10-DVS dataset (AEDAT4 format)
 
 # Data processing and visualization
 pandas>=1.3.0
