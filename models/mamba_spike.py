@@ -202,7 +202,8 @@ class SpikingFrontEnd(nn.Module):
         kernel_size: int = 3,
         beta: float = 0.97,  # Adjusted for ~30ms time constant (paper Fig 5)
         spike_grad: Optional[object] = None,
-        use_recurrent: bool = True
+        use_recurrent: bool = True,
+        pool_1d: bool = False  # For 1D audio data
     ):
         super().__init__()
 
@@ -227,8 +228,11 @@ class SpikingFrontEnd(nn.Module):
             self.recurrent2 = nn.Conv2d(hidden_channels, hidden_channels, 1)
             self.recurrent3 = nn.Conv2d(out_channels, out_channels, 1)
 
-        # Pooling
-        self.pool = nn.MaxPool2d(2)
+        # Pooling - use (2, 1) for 1D audio, (2, 2) for 2D images
+        if pool_1d:
+            self.pool = nn.MaxPool2d((2, 1))  # Only pool in frequency dimension
+        else:
+            self.pool = nn.MaxPool2d(2)
         
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
@@ -369,20 +373,22 @@ class MambaSpike(nn.Module):
         n_layers: int = 4,
         d_state: int = 16,
         beta: float = 0.9,
+        pool_1d: bool = False,  # For 1D audio data
     ):
         super().__init__()
-        
+
         # Spiking front-end
         self.spiking_frontend = SpikingFrontEnd(
             in_channels=input_channels,
             hidden_channels=32,
             out_channels=spiking_channels,
-            beta=beta
+            beta=beta,
+            pool_1d=pool_1d
         )
-        
+
         # Calculate output size after pooling
         h_out = input_size[0] // 4  # Two pooling layers
-        w_out = input_size[1] // 4
+        w_out = input_size[1] // 4 if not pool_1d else input_size[1]  # No pooling in width for 1D
         spike_features = spiking_channels * h_out * w_out
         
         # Interface layer
@@ -498,6 +504,7 @@ def create_mamba_spike_ntidigits(num_classes: int = 11) -> MambaSpike:
         n_layers=4,
         d_state=16,
         beta=0.97,  # 30ms time constant per paper Fig 5
+        pool_1d=True  # Use 1D pooling for audio data
     )
 
 
