@@ -465,6 +465,20 @@ def create_mamba_spike_cifar10dvs(num_classes: int = 10) -> MambaSpike:
     )
 
 
+def create_mamba_spike_ntidigits(num_classes: int = 11) -> MambaSpike:
+    """Create Mamba-Spike model for N-TIDIGITS dataset (audio)."""
+    return MambaSpike(
+        input_channels=2,
+        input_size=(64, 1),  # 64 frequency channels from cochlea
+        num_classes=num_classes,
+        spiking_channels=64,
+        d_model=128,
+        n_layers=4,
+        d_state=16,
+        beta=0.97,  # 30ms time constant per paper Fig 5
+    )
+
+
 if __name__ == "__main__":
     # Test model creation
     model = create_mamba_spike_nmnist()

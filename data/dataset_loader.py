@@ -48,6 +48,11 @@ class NeuromorphicDataset:
                 'class': tonic.datasets.CIFAR10DVS,
                 'sensor_size': (128, 128, 2),
                 'num_classes': 10
+            },
+            'ntidigits': {
+                'class': tonic.datasets.NTIDIGITS18,
+                'sensor_size': (64, 1, 2),  # Cochlea: 64 frequency channels
+                'num_classes': 11  # Single digits: o, 1-9, z
             }
         }
         
@@ -98,6 +103,14 @@ class NeuromorphicDataset:
                 [train_size, len(full_dataset) - train_size],
                 generator=torch.Generator().manual_seed(42)
             )
+        elif self.dataset_name == 'ntidigits':
+            # NTIDIGITS needs single_digits=True for 11-class task
+            train_dataset = dataset_class(
+                save_to=os.path.join(self.data_dir, self.dataset_name),
+                train=True,
+                single_digits=True,
+                transform=self.transforms
+            )
         else:
             train_dataset = dataset_class(
                 save_to=os.path.join(self.data_dir, self.dataset_name),
@@ -130,6 +143,14 @@ class NeuromorphicDataset:
                 full_dataset,
                 [train_size, len(full_dataset) - train_size],
                 generator=torch.Generator().manual_seed(42)
+            )
+        elif self.dataset_name == 'ntidigits':
+            # NTIDIGITS needs single_digits=True for 11-class task
+            test_dataset = dataset_class(
+                save_to=os.path.join(self.data_dir, self.dataset_name),
+                train=False,
+                single_digits=True,
+                transform=self.transforms
             )
         else:
             test_dataset = dataset_class(
@@ -400,21 +421,68 @@ def prepare_cifar10dvs_dataset(
         time_window=time_window,
         dt=dt
     )
-    
+
     dataset.download_dataset()
-    
+
     train_loader = dataset.get_train_loader(
         batch_size=batch_size,
         shuffle=True,
         num_workers=num_workers
     )
-    
+
     test_loader = dataset.get_test_loader(
         batch_size=batch_size,
         shuffle=False,
         num_workers=num_workers
     )
-    
+
+    return train_loader, test_loader, dataset.num_classes
+
+
+def prepare_ntidigits_dataset(
+    data_dir: str = "./data",
+    batch_size: int = 32,
+    time_window: int = 300000,  # 300ms for audio
+    dt: float = 1000,  # 1ms bins
+    num_workers: int = 4
+) -> Tuple[DataLoader, DataLoader, int]:
+    """
+    Prepare N-TIDIGITS dataset for audio recognition.
+
+    N-TIDIGITS is a neuromorphic audio dataset created using a cochlea model.
+    Uses single digit recognition task (11 classes: o, 1-9, z).
+
+    Args:
+        data_dir: Directory to save/load data
+        batch_size: Batch size for training
+        time_window: Time window for audio events (microseconds)
+        dt: Time bin resolution (microseconds)
+        num_workers: Number of data loading workers
+
+    Returns:
+        train_loader, test_loader, num_classes
+    """
+    dataset = NeuromorphicDataset(
+        dataset_name='ntidigits',
+        data_dir=data_dir,
+        time_window=time_window,
+        dt=dt
+    )
+
+    dataset.download_dataset()
+
+    train_loader = dataset.get_train_loader(
+        batch_size=batch_size,
+        shuffle=True,
+        num_workers=num_workers
+    )
+
+    test_loader = dataset.get_test_loader(
+        batch_size=batch_size,
+        shuffle=False,
+        num_workers=num_workers
+    )
+
     return train_loader, test_loader, dataset.num_classes
 
 
