@@ -73,8 +73,8 @@ class SequentialMNISTTrainer:
         self.train_loader, self.test_loader, self.num_classes = prepare_sequential_mnist_dataset(
             batch_size=batch_size,
             num_workers=0,  # Avoid DataLoader issues
-            num_steps=100,
-            dt=1
+            time_steps=100,
+            dt=0.1
         )
         print(f"✓ Dataset loaded: {len(self.train_loader)} train batches, "
               f"{len(self.test_loader)} test batches\n")
