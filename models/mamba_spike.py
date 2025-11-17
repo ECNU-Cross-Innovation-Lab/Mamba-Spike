@@ -233,12 +233,23 @@ class SpikingFrontEnd(nn.Module):
     def forward(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
         """
         Args:
-            x: (B, T, C, H, W) tensor of event frames
+            x: (B, T, C, H, W) tensor of event frames for 2D data
+               or (B, T, C, H) tensor for 1D audio data
         Returns:
-            spikes: (B, T, C', H', W') tensor of output spikes
+            spikes: (B, T, C', H', W') tensor of output spikes for 2D data
+                    or (B, T, C', H') tensor for 1D audio data
             membrane: final membrane potential
         """
-        batch_size, time_steps, _, _, _ = x.shape
+        # Handle both 1D (audio) and 2D (image) data
+        if len(x.shape) == 4:
+            # 1D audio data: (B, T, C, H) -> add width dimension
+            batch_size, time_steps, c, h = x.shape
+            x = x.unsqueeze(-1)  # (B, T, C, H, 1)
+            is_1d = True
+        else:
+            # 2D image data: (B, T, C, H, W)
+            batch_size, time_steps, _, _, _ = x.shape
+            is_1d = False
 
         # Initialize membrane potentials
         mem1 = self.lif1.init_leaky()
@@ -282,6 +293,10 @@ class SpikingFrontEnd(nn.Module):
         # Stack spikes
         spikes = torch.stack(spk_rec, dim=1)  # (B, T, C, H, W)
 
+        # Remove width dimension for 1D audio data
+        if is_1d:
+            spikes = spikes.squeeze(-1)  # (B, T, C, H)
+
         return spikes, mem3
 
 
@@ -300,13 +315,20 @@ class SpikeToActivation(nn.Module):
     def forward(self, spikes: torch.Tensor) -> torch.Tensor:
         """
         Args:
-            spikes: (B, T, C, H, W) tensor of spikes (binary values)
+            spikes: (B, T, C, H, W) tensor for 2D data
+                    or (B, T, C, H) tensor for 1D audio data
         Returns:
             activations: (B, T, D) tensor of activations (continuous values)
         """
-        batch_size, time_steps, channels, height, width = spikes.shape
+        # Handle both 1D (audio) and 2D (image) data
+        if len(spikes.shape) == 4:
+            # 1D audio data: (B, T, C, H)
+            batch_size, time_steps, channels, height = spikes.shape
+        else:
+            # 2D image data: (B, T, C, H, W)
+            batch_size, time_steps, channels, height, width = spikes.shape
 
-        # Flatten spatial dimensions: (B, T, C*H*W)
+        # Flatten spatial dimensions: (B, T, C*H*W) or (B, T, C*H)
         spikes_flat = spikes.view(batch_size, time_steps, -1)
 
         # Accumulate spikes over fixed time window
