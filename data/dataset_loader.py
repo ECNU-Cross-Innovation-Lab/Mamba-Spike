@@ -69,12 +69,14 @@ class NeuromorphicDataset:
     def _create_transforms(self):
         """Create preprocessing transforms for event data."""
         transform_list = []
-        
-        # Denoise by removing isolated events
-        transform_list.append(
-            transforms.Denoise(filter_time=10000)
-        )
-        
+
+        # Denoise only for visual datasets (not audio)
+        # Audio datasets like NTIDIGITS don't have x,y coordinates
+        if self.dataset_name != 'ntidigits':
+            transform_list.append(
+                transforms.Denoise(filter_time=10000)
+            )
+
         # Convert to frames
         # Use n_time_bins to specify the number of time bins
         transform_list.append(
@@ -83,7 +85,7 @@ class NeuromorphicDataset:
                 n_time_bins=int(self.time_window / self.dt)
             )
         )
-        
+
         return transforms.Compose(transform_list)
     
     def get_train_loader(self, batch_size: int = 32, shuffle: bool = True, num_workers: int = 4):
