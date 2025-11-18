@@ -1,7 +1,11 @@
 # Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End
 
-[![CGI 2024](https://img.shields.io/badge/CGI_2024-Published-success)](https://doi.org/10.1007/978-3-031-82021-2_23)
-[![DOI](https://img.shields.io/badge/DOI-10.1007/978--3--031--82021--2__23-blue)](https://doi.org/10.1007/978-3-031-82021-2_23)
+[![CGI 2024](https://img.shields.io/badge/CGI_2024-Published-success)](https://doi.org/10.1007/978-3-031-82021-2_23
+        
+        )
+[![DOI](https://img.shields.io/badge/DOI-10.1007/978--3--031--82021--2__23-blue)](https://doi.org/10.1007/978-3-031-82021-2_23
+        
+        )
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
@@ -140,12 +144,12 @@ mambaspike/
 ├── data/
 │   └── dataset_loader.py           # Dataset loading utilities
 ├── models/
-│   └── mamba_spike.py              # Model architecture (paper-compliant)
-├── train_nmnist.py                 # N-MNIST training (target: 99.5%)
-├── train_dvsgesture.py             # DVS Gesture training (target: 96.8%)
-├── train_cifar10dvs.py             # CIFAR10-DVS training (target: 78.9%)
-├── train_sequential_mnist.py       # Sequential MNIST training (target: 99.4%)
-├── train_ntidigits.py              # N-TIDIGITS training (target: 99.2%)
+│   └── mamba_spike.py              # Model architecture 
+├── train_nmnist.py                 # N-MNIST training 
+├── train_dvsgesture.py             # DVS Gesture training 
+├── train_cifar10dvs.py             # CIFAR10-DVS training 
+├── train_sequential_mnist.py       # Sequential MNIST training 
+├── train_ntidigits.py              # N-TIDIGITS training 
 ├── evaluate.py                     # Evaluation script
 ├── requirements.txt                # Dependencies
 └── README.md                       # This file
@@ -181,6 +185,8 @@ If you use this code in your research, please cite:
 ```
 
 **Reference**: Qin, J., Liu, F. (2025). Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing. In: Magnenat-Thalmann, N., Kim, J., Sheng, B., Deng, Z., Thalmann, D., Li, P. (eds) Advances in Computer Graphics. CGI 2024. Lecture Notes in Computer Science, vol 15339. Springer, Cham. https://doi.org/10.1007/978-3-031-82021-2_23
+        
+        
 
 ## License
 
