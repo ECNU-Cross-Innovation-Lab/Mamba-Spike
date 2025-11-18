@@ -58,49 +58,42 @@ Datasets will be automatically downloaded when running the training scripts.
 
 ## Training
 
-Each dataset has a dedicated training script with optimized hyperparameters.
+Each dataset has a dedicated training script.
 
-### N-MNIST (Target: 99.5%)
-
-```bash
-python train_nmnist.py --batch-size 32 --lr 0.001 --epochs 200
-```
-
-### DVS Gesture (Target: 96.8%)
+### N-MNIST 
 
 ```bash
-python train_dvsgesture.py --batch-size 16 --lr 0.001 --epochs 200
+python train_nmnist.py 
 ```
 
-### CIFAR10-DVS (Target: 78.9%)
+### DVS Gesture
 
 ```bash
-python train_cifar10dvs.py --batch-size 8 --lr 0.001 --epochs 200
+python train_dvsgesture.py 
 ```
 
-Note: Uses conservative batch size for memory stability. Dataset size is ~4GB and will be downloaded on first run.
-
-### Sequential MNIST (Target: 99.4%)
+### CIFAR10-DVS 
 
 ```bash
-python train_sequential_mnist.py --batch-size 32 --lr 0.001 --epochs 200
+python train_cifar10dvs.py 
 ```
 
-### N-TIDIGITS (Target: 99.2%)
+
+### Sequential MNIST 
 
 ```bash
-python train_ntidigits.py --batch-size 32 --lr 0.001 --epochs 200
+python train_sequential_mnist.py 
 ```
 
-Note: Audio dataset with 64 frequency channels from cochlea simulation.
+### N-TIDIGITS 
 
-### Training Features
+```bash
+python train_ntidigits.py 
+```
 
-- **TensorBoard Logging**: Track training progress in real-time
-- **Checkpoint Saving**: Best and latest models saved automatically
-- **Device Auto-Detection**: Automatically uses CUDA, MPS, or CPU
-- **Progress Tracking**: Detailed console output with training/test metrics
-- **JSON Results**: Training configuration and results saved for analysis
+
+
+
 
 ### Training Parameters
 
