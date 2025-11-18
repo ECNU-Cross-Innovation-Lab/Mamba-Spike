@@ -47,61 +47,88 @@ pip install -r requirements.txt
 
 ### 2. Dataset Preparation
 
-The project supports four neuromorphic datasets:
+The project supports five neuromorphic datasets:
 - **N-MNIST**: Neuromorphic version of MNIST (34x34 resolution)
 - **DVS Gesture**: Dynamic hand gestures (128x128 resolution)
 - **CIFAR10-DVS**: Neuromorphic version of CIFAR-10 (128x128 resolution)
 - **Sequential MNIST**: Standard MNIST converted to spike trains (28x28 resolution)
+- **N-TIDIGITS**: Neuromorphic audio dataset (64 frequency channels)
 
-Datasets will be automatically downloaded when running the training script.
+Datasets will be automatically downloaded when running the training scripts.
 
 ## Training
 
-### Basic Training
+Each dataset has a dedicated training script with optimized hyperparameters and automatic early stopping. Training automatically stops when reaching 99.9% of the paper's target accuracy.
 
-To train on N-MNIST:
+### N-MNIST (Target: 99.5%, Early Stop: 99.40%)
+
 ```bash
-python train.py --dataset nmnist --epochs 100 --batch-size 32
+python train_nmnist.py --batch-size 32 --lr 0.001 --epochs 200
 ```
 
-To train on DVS Gesture:
+### DVS Gesture (Target: 96.8%, Early Stop: 96.73%)
+
 ```bash
-python train.py --dataset dvsgesture --epochs 150 --batch-size 16 --lr 5e-4
+python train_dvsgesture.py --batch-size 16 --lr 0.001 --epochs 200
 ```
 
-To train on CIFAR10-DVS:
+### CIFAR10-DVS (Target: 78.9%, Early Stop: 78.82%)
+
 ```bash
-python train.py --dataset cifar10dvs --epochs 200 --batch-size 32 --lr 1e-3
+python train_cifar10dvs.py --batch-size 8 --lr 0.001 --epochs 200
 ```
 
-To train on Sequential MNIST:
+Note: Uses conservative batch size for memory stability. Dataset size is ~4GB and will be downloaded on first run.
+
+### Sequential MNIST (Target: 99.4%, Early Stop: 99.30%)
+
 ```bash
-python train.py --dataset sequential_mnist --epochs 100 --batch-size 64
+python train_sequential_mnist.py --batch-size 32 --lr 0.001 --epochs 200
 ```
+
+### N-TIDIGITS (Target: 99.2%, Early Stop: 99.10%)
+
+```bash
+python train_ntidigits.py --batch-size 32 --lr 0.001 --epochs 200
+```
+
+Note: Audio dataset with 64 frequency channels from cochlea simulation.
+
+### Training Features
+
+- **Automatic Early Stopping**: Stops when reaching 99.9% of paper target accuracy
+- **TensorBoard Logging**: Track training progress in real-time
+- **Checkpoint Saving**: Best and latest models saved automatically
+- **Device Auto-Detection**: Automatically uses CUDA, MPS, or CPU
+- **Progress Tracking**: Detailed console output with training/test metrics
+- **JSON Results**: Training configuration and results saved for analysis
 
 ### Training Parameters
 
-- `--dataset`: Choose from `nmnist`, `dvsgesture`, `cifar10dvs`, `sequential_mnist`
-- `--epochs`: Number of training epochs
-- `--batch-size`: Batch size for training
-- `--lr`: Learning rate (default: 1e-3)
-- `--weight-decay`: Weight decay for AdamW optimizer (default: 1e-4)
-- `--time-window`: Time window in microseconds (default: 300000)
-- `--dt`: Time bin in microseconds (default: 1000)
-- `--output-dir`: Directory to save outputs (default: ./outputs)
+All training scripts support:
+- `--batch-size`: Batch size for training (default varies by dataset)
+- `--lr`: Learning rate (default: 0.001)
+- `--epochs`: Maximum training epochs (default: 200)
 
 ## Evaluation
 
 To evaluate a trained model:
 
 ```bash
-python evaluate.py --checkpoint outputs/nmnist_*/checkpoint_best.pth
+python evaluate.py --checkpoint results/nmnist_*/checkpoint_best.pth
 ```
 
 With additional analysis:
 ```bash
-python evaluate.py --checkpoint outputs/nmnist_*/checkpoint_best.pth --analyze-temporal --compare-paper
+python evaluate.py --checkpoint results/nmnist_*/checkpoint_best.pth --analyze-temporal --compare-paper
 ```
+
+Training results are saved in `results/<dataset>_<timestamp>/` with:
+- `checkpoint_best.pth`: Best model checkpoint
+- `checkpoint_latest.pth`: Latest model checkpoint
+- `config.json`: Training configuration
+- `final_results.json`: Final accuracy and training time
+- `tensorboard/`: TensorBoard logs
 
 ## Results
 
@@ -119,13 +146,17 @@ Performance comparison on various neuromorphic datasets:
 ```
 mambaspike/
 ├── data/
-│   └── dataset_loader.py      # Dataset loading utilities (includes Sequential MNIST)
+│   └── dataset_loader.py           # Dataset loading utilities
 ├── models/
-│   └── mamba_spike.py         # Model architecture (paper-compliant)
-├── train.py                   # Training script
-├── evaluate.py                # Evaluation script
-├── requirements.txt           # Dependencies
-└── README.md                  # This file
+│   └── mamba_spike.py              # Model architecture (paper-compliant)
+├── train_nmnist.py                 # N-MNIST training (target: 99.5%)
+├── train_dvsgesture.py             # DVS Gesture training (target: 96.8%)
+├── train_cifar10dvs.py             # CIFAR10-DVS training (target: 78.9%)
+├── train_sequential_mnist.py       # Sequential MNIST training (target: 99.4%)
+├── train_ntidigits.py              # N-TIDIGITS training (target: 99.2%)
+├── evaluate.py                     # Evaluation script
+├── requirements.txt                # Dependencies
+└── README.md                       # This file
 ```
 
 ## Key Features
