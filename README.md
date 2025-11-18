@@ -58,21 +58,21 @@ Datasets will be automatically downloaded when running the training scripts.
 
 ## Training
 
-Each dataset has a dedicated training script with optimized hyperparameters and automatic early stopping. Training automatically stops when reaching 99.9% of the paper's target accuracy.
+Each dataset has a dedicated training script with optimized hyperparameters.
 
-### N-MNIST (Target: 99.5%, Early Stop: 99.40%)
+### N-MNIST (Target: 99.5%)
 
 ```bash
 python train_nmnist.py --batch-size 32 --lr 0.001 --epochs 200
 ```
 
-### DVS Gesture (Target: 96.8%, Early Stop: 96.73%)
+### DVS Gesture (Target: 96.8%)
 
 ```bash
 python train_dvsgesture.py --batch-size 16 --lr 0.001 --epochs 200
 ```
 
-### CIFAR10-DVS (Target: 78.9%, Early Stop: 78.82%)
+### CIFAR10-DVS (Target: 78.9%)
 
 ```bash
 python train_cifar10dvs.py --batch-size 8 --lr 0.001 --epochs 200
@@ -80,13 +80,13 @@ python train_cifar10dvs.py --batch-size 8 --lr 0.001 --epochs 200
 
 Note: Uses conservative batch size for memory stability. Dataset size is ~4GB and will be downloaded on first run.
 
-### Sequential MNIST (Target: 99.4%, Early Stop: 99.30%)
+### Sequential MNIST (Target: 99.4%)
 
 ```bash
 python train_sequential_mnist.py --batch-size 32 --lr 0.001 --epochs 200
 ```
 
-### N-TIDIGITS (Target: 99.2%, Early Stop: 99.10%)
+### N-TIDIGITS (Target: 99.2%)
 
 ```bash
 python train_ntidigits.py --batch-size 32 --lr 0.001 --epochs 200
@@ -96,7 +96,6 @@ Note: Audio dataset with 64 frequency channels from cochlea simulation.
 
 ### Training Features
 
-- **Automatic Early Stopping**: Stops when reaching 99.9% of paper target accuracy
 - **TensorBoard Logging**: Track training progress in real-time
 - **Checkpoint Saving**: Best and latest models saved automatically
 - **Device Auto-Detection**: Automatically uses CUDA, MPS, or CPU

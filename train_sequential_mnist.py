@@ -2,7 +2,6 @@
 """
 Sequential MNIST Dataset Training Script
 Target Accuracy: 99.4% (from paper)
-Auto-stops when test accuracy reaches 99.9% of target (99.30%)
 """
 
 import os
@@ -22,9 +21,8 @@ from models.mamba_spike import create_mamba_spike_sequential_mnist
 
 class SequentialMNISTTrainer:
     def __init__(self, batch_size=32, lr=0.001, max_epochs=200):
-        # Paper target and early stopping threshold
+        # Paper target accuracy
         self.target_accuracy = 99.4
-        self.early_stop_threshold = self.target_accuracy * 0.999  # 99.30%
 
         # Setup device
         self.device = self._setup_device()
@@ -45,7 +43,7 @@ class SequentialMNISTTrainer:
         self.config = {
             "dataset": "sequential_mnist",
             "target_accuracy": self.target_accuracy,
-            "early_stop_threshold": self.early_stop_threshold,
+            
             "batch_size": batch_size,
             "lr": lr,
             "max_epochs": max_epochs,
@@ -63,7 +61,6 @@ class SequentialMNISTTrainer:
         print("Sequential MNIST Training")
         print("="*70)
         print(f"Target Accuracy: {self.target_accuracy}%")
-        print(f"Early Stop Threshold: {self.early_stop_threshold:.2f}%")
         print(f"Max Epochs: {max_epochs}")
         print(f"Batch Size: {batch_size}")
         print(f"Device: {self.device}")
@@ -253,41 +250,9 @@ class SequentialMNISTTrainer:
                 # Save checkpoint
                 self.save_checkpoint(epoch, test_acc, is_best)
 
-                # Check early stopping
-                if test_acc >= self.early_stop_threshold:
-                    elapsed = time.time() - self.start_time
-                    print("\n" + "="*70)
-                    print("🎯 TARGET REACHED!")
-                    print("="*70)
-                    print(f"Target: {self.target_accuracy}%")
-                    print(f"Threshold: {self.early_stop_threshold:.2f}%")
-                    print(f"Achieved: {test_acc:.2f}%")
-                    print(f"Epoch: {epoch}/{self.max_epochs}")
-                    print(f"Training time: {elapsed/3600:.2f} hours")
-                    print("="*70 + "\n")
-
-                    # Save final results
-                    results = {
-                        'target_reached': True,
-                        'target_accuracy': self.target_accuracy,
-                        'threshold': self.early_stop_threshold,
-                        'achieved_accuracy': test_acc,
-                        'best_accuracy': self.best_acc,
-                        'final_epoch': epoch,
-                        'total_epochs': self.max_epochs,
-                        'training_time_hours': elapsed / 3600
-                    }
-
-                    with open(os.path.join(self.output_dir, 'final_results.json'), 'w') as f:
-                        json.dump(results, f, indent=2)
-
-                    print(f"✓ Results saved to: {self.output_dir}")
-                    break
-
                 # Progress update
                 print(f"  Best so far: {self.best_acc:.2f}% (Epoch {self.best_epoch})")
-                print(f"  Target: {self.early_stop_threshold:.2f}% "
-                      f"(Gap: {self.early_stop_threshold - test_acc:.2f}%)")
+                print(f"  Target: {self.target_accuracy:.2f}%")
                 print()
 
         except KeyboardInterrupt:
