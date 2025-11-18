@@ -2,7 +2,7 @@
 """
 CIFAR10-DVS Dataset Training Script
 Target Accuracy: 78.9% (from paper)
-Auto-stops when test accuracy reaches 99% of target (78.11%)
+Auto-stops when test accuracy reaches 99.9% of target (78.82%)
 """
 
 import os
@@ -24,7 +24,7 @@ class CIFAR10DVSTrainer:
     def __init__(self, batch_size=8, lr=0.001, max_epochs=200):
         # Paper target and early stopping threshold
         self.target_accuracy = 78.9
-        self.early_stop_threshold = self.target_accuracy * 0.99  # 78.11%
+        self.early_stop_threshold = self.target_accuracy * 0.999  # 78.82%
 
         # Setup device
         self.device = self._setup_device()

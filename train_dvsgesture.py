@@ -2,7 +2,7 @@
 """
 DVS Gesture Dataset Training Script
 Target Accuracy: 96.8% (from paper)
-Auto-stops when test accuracy reaches 99% of target (95.83%)
+Auto-stops when test accuracy reaches 99.9% of target (96.73%)
 """
 
 import os
@@ -24,7 +24,7 @@ class DVSGestureTrainer:
     def __init__(self, batch_size=16, lr=0.001, max_epochs=200):
         # Paper target and early stopping threshold
         self.target_accuracy = 96.8
-        self.early_stop_threshold = self.target_accuracy * 0.99  # 95.83%
+        self.early_stop_threshold = self.target_accuracy * 0.999  # 96.73%
 
         # Setup device
         self.device = self._setup_device()

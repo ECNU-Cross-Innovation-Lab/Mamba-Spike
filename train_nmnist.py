@@ -2,7 +2,7 @@
 """
 N-MNIST Dataset Training Script
 Target Accuracy: 99.5% (from paper)
-Auto-stops when test accuracy reaches 99% of target (98.505%)
+Auto-stops when test accuracy reaches 99.9% of target (99.40%)
 """
 
 import os
@@ -24,7 +24,7 @@ class NMNISTTrainer:
     def __init__(self, batch_size=32, lr=0.001, max_epochs=200):
         # Paper target and early stopping threshold
         self.target_accuracy = 99.5
-        self.early_stop_threshold = self.target_accuracy * 0.99  # 98.505%
+        self.early_stop_threshold = self.target_accuracy * 0.999  # 99.40%
 
         # Setup device
         self.device = self._setup_device()

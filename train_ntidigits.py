@@ -2,7 +2,7 @@
 """
 N-TIDIGITS Dataset Training Script
 Target Accuracy: 99.2% (from paper)
-Auto-stops when test accuracy reaches 99% of target (98.208%)
+Auto-stops when test accuracy reaches 99.9% of target (99.10%)
 """
 
 import os
@@ -24,7 +24,7 @@ class NTIDIGITSTrainer:
     def __init__(self, batch_size=32, lr=0.001, max_epochs=200):
         # Paper target and early stopping threshold
         self.target_accuracy = 99.2
-        self.early_stop_threshold = self.target_accuracy * 0.99  # 98.208%
+        self.early_stop_threshold = self.target_accuracy * 0.999  # 99.10%
 
         # Setup device
         self.device = self._setup_device()
