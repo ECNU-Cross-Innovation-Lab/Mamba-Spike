@@ -30,10 +30,12 @@ wheels/
 
 # Data
 data/*/
+!data/__init__.py
 !data/dataset_loader.py
 
 # Outputs
 outputs/
+results/
 fast_experiments/
 logs/
 runs/
@@ -62,12 +64,26 @@ venv.bak/
 temp/
 tmp/
 
-# Experiments
-*_experiment.py
-analyze_results.py
-verify_setup.py
-test_implementation.py
-experiment_report.md
-IMPLEMENTATION_SUMMARY.md
-FINAL_SUMMARY.md
-run_experiments.sh
+# Training scripts (dataset-specific)
+train_*.py
+quick_train.py
+
+# Benchmark and analysis
+*benchmark*.py
+*analyze*.py
+check_cuda.py
+test_*.py
+extract_*.py
+get_*.py
+
+# Documentation (auto-generated)
+*_GUIDE.md
+*_SUMMARY.md
+*_FIX.md
+*_TEST.md
+*_SETUP.md
+COMPARISON_EXPERIMENT.md
+
+# Archives
+*.tar.gz
+*.zip

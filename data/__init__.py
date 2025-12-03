@@ -2,6 +2,7 @@
 
 from .dataset_loader import (
     NeuromorphicDataset,
+    PreprocessedDataset,
     prepare_nmnist_dataset,
     prepare_dvsgesture_dataset,
     prepare_cifar10dvs_dataset,
@@ -11,6 +12,7 @@ from .dataset_loader import (
 
 __all__ = [
     'NeuromorphicDataset',
+    'PreprocessedDataset',
     'prepare_nmnist_dataset',
     'prepare_dvsgesture_dataset',
     'prepare_cifar10dvs_dataset',

@@ -1,203 +1,138 @@
-# Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End
+# Mamba-Spike
 
-[![CGI 2024](https://img.shields.io/badge/CGI_2024-Published-success)](https://doi.org/10.1007/978-3-031-82021-2_23
-        
-        )
-[![DOI](https://img.shields.io/badge/DOI-10.1007/978--3--031--82021--2__23-blue)](https://doi.org/10.1007/978-3-031-82021-2_23
-        
-        )
+> Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing
+
+[![CGI 2024](https://img.shields.io/badge/CGI_2024-Published-success)](https://doi.org/10.1007/978-3-031-82021-2_23)
+[![DOI](https://img.shields.io/badge/DOI-10.1007/978--3--031--82021--2__23-blue)](https://doi.org/10.1007/978-3-031-82021-2_23)
 [![Python 3.9+](https://img.shields.io/badge/python-3.9+-blue.svg)](https://www.python.org/downloads/)
 [![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-ee4c2c.svg)](https://pytorch.org/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This is a PyTorch implementation of the paper **"Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing"** published in CGI 2024 (Computer Graphics International Conference).
+This is a PyTorch implementation of the paper **"Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing"** published at CGI 2024.
 
 ## Overview
 
-Mamba-Spike is a novel neuromorphic architecture that integrates a spiking front-end with the Mamba backbone to achieve efficient and robust temporal data processing. The architecture leverages:
+Mamba-Spike is a novel neuromorphic architecture that integrates a spiking front-end with the Mamba backbone for efficient and robust temporal data processing.
+
+**Key Features:**
 
 - **Event-driven processing** through Spiking Neural Networks (SNNs)
 - **Selective state spaces** for efficient sequence modeling
 - **Linear-time complexity** for processing long temporal sequences
 - **Energy-efficient computation** through sparse spike representations
 
-### Architecture Components
+### Architecture
 
-1. **Spiking Front-End**: Uses Leaky Integrate-and-Fire (LIF) neurons with recurrent connections to encode event-based data into sparse spike representations
-2. **Interface Layer**: Converts spikes to continuous activations using fixed time window accumulation and firing rate normalization
-3. **Mamba Backbone**: Processes temporal sequences using selective state space models with linear-time complexity
-4. **Classification Head**: Outputs class predictions with layer normalization
-
-### Paper Compliance
-
-This implementation strictly follows the paper specifications:
-
-- **Recurrent Connections** (Page 6): Added to spiking front-end for temporal feature extraction
-- **LIF Time Constant** (Figure 5): Optimized to τ ≈ 30ms (beta=0.97) for best performance
-- **Spike-to-Activation** (Page 7): Implements fixed time window accumulation with firing rate normalization
-- **Sequential MNIST** (Table 1): Full support with rate coding conversion from standard MNIST
+| Component | Description |
+|-----------|-------------|
+| **Spiking Front-End** | LIF neurons with recurrent connections for event-based encoding |
+| **Interface Layer** | Fixed time window accumulation with firing rate normalization |
+| **Mamba Backbone** | Selective state space models with linear-time complexity |
+| **Classification Head** | Layer normalization with class predictions |
 
 ## Setup
 
-### 1. Environment Setup
-
-The project uses a conda environment named `mambaspike`:
-
 ```bash
+# Create conda environment
 conda create -n mambaspike python=3.9
 conda activate mambaspike
+
+# Install dependencies
 pip install -r requirements.txt
 ```
 
-### 2. Dataset Preparation
+## Datasets
 
 The project supports five neuromorphic datasets:
-- **N-MNIST**: Neuromorphic version of MNIST (34x34 resolution)
-- **DVS Gesture**: Dynamic hand gestures (128x128 resolution)
-- **CIFAR10-DVS**: Neuromorphic version of CIFAR-10 (128x128 resolution)
-- **Sequential MNIST**: Standard MNIST converted to spike trains (28x28 resolution)
-- **N-TIDIGITS**: Neuromorphic audio dataset (64 frequency channels)
 
-Datasets will be automatically downloaded when running the training scripts.
+| Dataset | Resolution | Classes | Description |
+|---------|------------|---------|-------------|
+| N-MNIST | 34x34 | 10 | Neuromorphic MNIST |
+| DVS Gesture | 128x128 | 11 | Dynamic hand gestures |
+| CIFAR10-DVS | 128x128 | 10 | Neuromorphic CIFAR-10 |
+| Sequential MNIST | 28x28 | 10 | Temporal MNIST |
+| N-TIDIGITS | 64 channels | 11 | Neuromorphic audio |
+
+**Data Format:** Place preprocessed data in `data/preprocessed/` as pickle files:
+- `{dataset}_train.pkl` - Training data
+- `{dataset}_test.pkl` - Test data
+
+Each pickle file should contain: `{'data': np.ndarray, 'labels': np.ndarray}`
 
 ## Training
 
-Each dataset has a dedicated training script.
-
-### N-MNIST 
-
 ```bash
-python train_nmnist.py 
+python train.py --dataset <dataset_name> --batch-size <size> --lr <learning_rate> --epochs <num>
 ```
-
-### DVS Gesture
-
-```bash
-python train_dvsgesture.py 
-```
-
-### CIFAR10-DVS 
-
-```bash
-python train_cifar10dvs.py 
-```
-
-
-### Sequential MNIST 
-
-```bash
-python train_sequential_mnist.py 
-```
-
-### N-TIDIGITS 
-
-```bash
-python train_ntidigits.py 
-```
-
-
-
-
 
 ### Training Parameters
 
-All training scripts support:
-- `--batch-size`: Batch size for training (default varies by dataset)
-- `--lr`: Learning rate (default: 0.001)
-- `--epochs`: Maximum training epochs (default: 200)
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `--dataset` | nmnist | Dataset name |
+| `--batch-size` | 32 | Batch size |
+| `--lr` | 0.001 | Learning rate |
+| `--epochs` | 200 | Training epochs |
 
 ## Evaluation
 
-To evaluate a trained model:
-
 ```bash
-python evaluate.py --checkpoint results/nmnist_*/checkpoint_best.pth
+python evaluate.py --checkpoint results/<experiment>/checkpoint_best.pth
 ```
 
-With additional analysis:
-```bash
-python evaluate.py --checkpoint results/nmnist_*/checkpoint_best.pth --analyze-temporal --compare-paper
-```
-
-Training results are saved in `results/<dataset>_<timestamp>/` with:
-- `checkpoint_best.pth`: Best model checkpoint
-- `checkpoint_latest.pth`: Latest model checkpoint
-- `config.json`: Training configuration
-- `final_results.json`: Final accuracy and training time
-- `tensorboard/`: TensorBoard logs
+**Options:**
+- `--analyze-temporal` - Temporal analysis
+- `--compare-paper` - Compare with paper results
 
 ## Results
 
-Performance comparison on various neuromorphic datasets:
-
-| Dataset         | Mamba-Spike | Mamba | SLAYER | DECOLLE | Spiking-YOLO |
-|-----------------|-------------|-------|---------|---------|--------------|
-| DVS Gesture     | **97.8%**   | 96.8% | 93.6%   | 95.2%   | 96.1%        |
-| TIDIGITS        | **99.2%**   | 98.7% | 97.5%   | 98.3%   | -            |
-| Sequential MNIST| **99.4%**   | 99.3% | -       | -       | -            |
-| CIFAR10-DVS     | **92.5%**   | 91.8% | 87.3%   | 89.6%   | 91.2%        |
+| Dataset | Mamba-Spike | Mamba | SLAYER | DECOLLE |
+|---------|:-----------:|:-----:|:------:|:-------:|
+| DVS Gesture | **97.8%** | 96.8% | 93.6% | 95.2% |
+| TIDIGITS | **99.2%** | 98.7% | 97.5% | 98.3% |
+| Sequential MNIST | **99.4%** | 99.3% | - | - |
+| CIFAR10-DVS | **92.5%** | 91.8% | 87.3% | 89.6% |
 
 ## Project Structure
 
 ```
 mambaspike/
 ├── data/
-│   └── dataset_loader.py           # Dataset loading utilities
+│   ├── __init__.py
+│   └── dataset_loader.py      # Data loading utilities
 ├── models/
-│   └── mamba_spike.py              # Model architecture 
-├── train_nmnist.py                 # N-MNIST training 
-├── train_dvsgesture.py             # DVS Gesture training 
-├── train_cifar10dvs.py             # CIFAR10-DVS training 
-├── train_sequential_mnist.py       # Sequential MNIST training 
-├── train_ntidigits.py              # N-TIDIGITS training 
-├── evaluate.py                     # Evaluation script
-├── requirements.txt                # Dependencies
-└── README.md                       # This file
+│   ├── __init__.py
+│   └── mamba_spike.py         # Model architecture
+├── architecture/
+│   └── README.md              # Architecture documentation
+├── train.py                   # Training script
+├── evaluate.py                # Evaluation script
+├── requirements.txt           # Dependencies
+└── README.md
 ```
-
-## Key Features
-
-1. **Paper-Compliant Implementation**: Strictly follows all architectural specifications from the CGI 2024 paper
-2. **Recurrent Spiking Front-End**: Temporal feature extraction through recurrent connections (30ms time constant)
-3. **Efficient Temporal Processing**: Leverages Mamba's selective state spaces for O(L) complexity
-4. **Neuromorphic Data Support**: Native processing of event-based data (DVS cameras, Sequential MNIST)
-5. **Multi-Scale Architecture**: Supports different input resolutions (28×28 to 128×128)
-6. **Flexible Training**: Easy to adapt for different neuromorphic datasets
 
 ## Citation
 
-If you use this code in your research, please cite:
-
 ```bibtex
 @inproceedings{qin2025mambaspike,
-  title={Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing},
-  author={Qin, Jiahao and Liu, Feng},
-  booktitle={Advances in Computer Graphics: 41st Computer Graphics International Conference, CGI 2024},
-  pages={303--315},
-  year={2025},
-  publisher={Springer},
-  address={Cham},
-  series={Lecture Notes in Computer Science},
-  volume={15339},
-  doi={10.1007/978-3-031-82021-2_23},
-  url={https://doi.org/10.1007/978-3-031-82021-2_23}
+  title     = {Mamba-Spike: Enhancing the Mamba Architecture with a Spiking
+               Front-End for Efficient Temporal Data Processing},
+  author    = {Qin, Jiahao and Liu, Feng},
+  booktitle = {Advances in Computer Graphics: 41st Computer Graphics
+               International Conference, CGI 2024},
+  pages     = {303--315},
+  year      = {2025},
+  publisher = {Springer},
+  series    = {Lecture Notes in Computer Science},
+  volume    = {15339},
+  doi       = {10.1007/978-3-031-82021-2_23}
 }
 ```
 
-**Reference**: Qin, J., Liu, F. (2025). Mamba-Spike: Enhancing the Mamba Architecture with a Spiking Front-End for Efficient Temporal Data Processing. In: Magnenat-Thalmann, N., Kim, J., Sheng, B., Deng, Z., Thalmann, D., Li, P. (eds) Advances in Computer Graphics. CGI 2024. Lecture Notes in Computer Science, vol 15339. Springer, Cham. https://doi.org/10.1007/978-3-031-82021-2_23
-        
-        
-
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see [LICENSE](LICENSE) for details.
 
 ## Contact
 
-For questions or issues, please:
-- Open an issue on GitHub
-- Contact the paper authors (see paper for details)
-
----
-
-**Note**: This is a research implementation. For production use, additional testing and optimization may be required.
+For questions or issues, please open an issue on GitHub or contact the paper authors.
